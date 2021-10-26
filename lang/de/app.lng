@@ -1,0 +1,41 @@
+mainmenu.resumegame:Zurück zum Spiel
+mainmenu.stopgame:Spiel beenden
+mainmenu.play:Spielen
+mainmenu.mods:Modifikationen
+mainmenu.settings:Einstellungen
+mainmenu.quit:Beenden
+playmenu.btnplay:Neues Spiel
+playmenu.btnload:Spiel laden
+playmenu.savedgames:Gespeicherte Spiele
+playmenu.nosavedgamesyet:Noch keine gespeicherten Spiele vorhanden
+playmenu.info.selectgamestate:Bitte zuerst einen Spielstand auswählen
+packagemenu.btnplay:Spielen
+packagemenu.btnbrowse:Workshop durchsuchen
+packagemenu.nomodsfound:Keine Mods gefunden
+settingsmenu.keys.btnsave:Speichern
+settingsmenu.keys.btnrestoredefaults:Standard wiederherstellen
+settingsmenu.keys.info.saved:Einstellungen gespeichert!
+settingsmenu.keys.info.defaultrestored:Standard wurde wiederhergestellt
+settingsmenu.gfx.lblfullscreen:Vollbildmodus aktivieren
+settingsmenu.gfx.btnsave:Speichern
+settingsmenu.gfx.restarthint:Hinweis: Ändern der Grafik/UI Einstellungen führt zu Neustart der App
+settingsmenu.gfx.info.saved:Einstellungen gespeichert!
+settingsmenu.snd.btnsave:Speichern
+settingsmenu.snd.volume:Lautstärke: 
+settingsmenu.snd.info.saved:Einstellungen gespeichert!
+settingsmenu.tabs.bindings:Eingabe  
+settingsmenu.tabs.gfxui:Grafik/UI
+settingsmenu.tabs.snd:Audio    
+intermissionmenu.returntomainmenu:Zurück zum Hauptmenü
+intermissionmenu.gamecompleted:Spiel erfolgreich beendet
+intermissionmenu.proceedwithnextmap:Nächste Map spielen
+intermissionmenu.mapcompleted:Map erfolgreich beendet
+intermissionmenu.achievedscore:Deine erreichte Punktzahl: ${ACHIEVED_SCORE}
+gameovermenu.frmtitle:Spiel vorbei
+gameovermenu.btnrestart:Wiederholen
+gameovermenu.btnlastsavedgame:Schnellladen
+gameovermenu.btnreturntomainmenu:Zurück zum Hauptmenü
+gameovermenu.hint1:Das Spiel ist vorbei.
+gameovermenu.hint2:Du kannst es erneut versuchen oder das Spiel beenden
+savegame.success:Spielstand gespeichert!
+savegame.failure:Fehler beim Speichern des Spielstandes
