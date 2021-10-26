@@ -41,7 +41,7 @@ class CTeslaTower : IScriptedEntity
 	float GetAimRotation(const Vector &in vPos)
 	{
 		//Get aim rotation
-		const float PI = 3.141592f;
+		
 		float fAngle = atan2(float(vPos[1] - this.m_vecPos[1]), float(vPos[0] - this.m_vecPos[0]));
 		return fAngle - 6.30 / 4;
 	}
