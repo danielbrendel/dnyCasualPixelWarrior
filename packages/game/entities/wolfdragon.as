@@ -13,34 +13,31 @@
 
 #include "weapon_bolt.as"
 #include "blooddecal.as"
+#include "weapon_laserball.as"
 
 string g_szPackagePath = "";
-const int C_FROGATOR_REACT_RANGE = 500;
-const int C_FROGATOR_ATTACK_RANGE = 200;
-const float C_FROGATOR_DEFAULT_SPEED = 150.0;
+const int C_WOLFDRAGON_REACT_RANGE = 500;
+const int C_WOLFDRAGON_ATTACK_RANGE = 300;
+const float C_WOLFDRAGON_DEFAULT_SPEED = 75.0;
 
-/* Frogator entity */
-class CFrogator : IScriptedEntity
+/* Wolfdragon entity */
+class CWolfdragon : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	float m_fRotation;
 	Model m_oModel;
 	SpriteHandle m_hMove;
-	SpriteHandle m_hAttack;
 	int m_iSpriteIndex;
 	Timer m_tmrSpriteChange;
 	Timer m_tmrMayDamage;
 	Timer m_tmrAttack;
 	Timer m_tmrDirChange;
-	Timer m_tmrStand;
 	Timer m_tmrMove;
-	Timer m_tmrAttackAnim;
 	Timer m_tmrFlicker;
 	bool m_bGotEnemy;
 	float m_fSpeed;
 	SoundHandle m_hAttackSound;
-	int m_iSpriteAttackIndex;
 	bool m_bLastGotEnemy;
 	bool m_bInAttackRange;
 	uint32 m_uiHealth;
@@ -69,18 +66,32 @@ class CFrogator : IScriptedEntity
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;
 		
-		CBoltEntity@ obj = CBoltEntity();
-		
-		Vector vTargetPos = pEntity.GetPosition();
-		Vector vTargetCenter = pEntity.GetModel().GetCenter();
-		Vector vAbsTargetPos = Vector(vTargetPos[0] + vTargetCenter[0], vTargetPos[1] + vTargetCenter[1]);
-		
-		obj.SetRotation(this.GetAimRotation(vAbsTargetPos));
-		obj.SetTarget(pEntity);
-		
-		Ent_SpawnEntity("weapon_bolt", @obj, Vector(this.m_vecPos[0] + 35, this.m_vecPos[1] + 130));
+		for (int i = 0; i < 5; i++) {
+			CLaserBallEntity@ ball = CLaserBallEntity();
 
-		S_PlaySound(this.m_hAttackSound, 10);
+			float fBallRot = this.GetRotation();
+							
+			if (i == 0) {
+				fBallRot -= 0.3;
+			} else if (i == 1) {
+				fBallRot -= 0.2;
+			} else if (i == 3) {
+				fBallRot += 0.2;
+			} else if (i == 2) {
+				fBallRot += 0.3;
+			}
+
+			ball.SetRotation(fBallRot);
+			ball.SetOwner(@this);
+
+			Vector vecBulletPos = Vector(this.m_vecPos[0] + 100, this.m_vecPos[1] + 100);
+			//vecBulletPos[0] += int(sin(this.GetRotation()) * 50);
+			//vecBulletPos[1] -= int(cos(this.GetRotation()) * 50);
+
+			Ent_SpawnEntity("weapon_laserball", ball, vecBulletPos);
+		}
+
+		S_PlaySound(this.m_hAttackSound, S_GetCurrentVolume());
 	}
 	
 	void CheckForEnemiesInRange()
@@ -91,58 +102,36 @@ class CFrogator : IScriptedEntity
 		this.m_bInAttackRange = false;
 
 		IScriptedEntity@ pEntity = Ent_GetPlayerEntity();
-		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_FROGATOR_REACT_RANGE) {
+		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_WOLFDRAGON_REACT_RANGE) {
 			this.m_bGotEnemy = true;
 		}
 		
 		if (this.m_bGotEnemy) {
-			if (this.m_fSpeed == C_FROGATOR_DEFAULT_SPEED)
+			if (this.m_fSpeed == C_WOLFDRAGON_DEFAULT_SPEED)
 				this.m_fSpeed *= 2;
 				
 			this.LookAt(pEntity.GetPosition());
 
-			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_FROGATOR_ATTACK_RANGE) {
+			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_WOLFDRAGON_ATTACK_RANGE) {
 				this.m_bInAttackRange = true;
-				this.m_tmrMove.SetActive(false);
 				this.m_tmrAttack.Update();
 				if (this.m_tmrAttack.IsElapsed()) {
-					this.m_tmrAttackAnim.Reset();
-					this.m_tmrAttackAnim.SetActive(true);
-					this.m_iSpriteAttackIndex = 0;
-					this.Fire(pEntity);
 					this.m_tmrAttack.Reset();
-				}
-			} else {
-				if ((!this.m_tmrStand.IsActive()) && (!this.m_tmrMove.IsActive())) {
-					this.m_tmrStand.Reset();
-					this.m_tmrStand.SetActive(true);
-					this.m_iSpriteIndex = 0;
+					this.Fire(pEntity);
 				}
 			}
 
 			this.m_bLastGotEnemy = true;
-		} else {
-			if (this.m_bLastGotEnemy) {
-				this.m_bLastGotEnemy = false;
-
-				this.m_tmrStand.Reset();
-				this.m_tmrStand.SetActive(true);
-				this.m_iSpriteIndex = 0;
-
-				if (this.m_fSpeed != C_FROGATOR_DEFAULT_SPEED)
-					this.m_fSpeed = C_FROGATOR_DEFAULT_SPEED;
-			}
 		}
 	}
 
-	CFrogator()
+	CWolfdragon()
     {
-		this.m_vecSize = Vector(64, 64);
+		this.m_vecSize = Vector(128, 64);
 		this.m_iSpriteIndex = 0;
-		this.m_iSpriteAttackIndex = 0;
 		this.m_bGotEnemy = this.m_bLastGotEnemy = false;
-		this.m_fSpeed = C_FROGATOR_DEFAULT_SPEED;
-		this.m_uiHealth = 45;
+		this.m_fSpeed = C_WOLFDRAGON_DEFAULT_SPEED;
+		this.m_uiHealth = 90;
 		this.m_uiFlickerCount = 0;
     }
 	
@@ -151,14 +140,11 @@ class CFrogator : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\frogator_move.png", 6, 80, 80, 6, false);
-		this.m_hAttack = R_LoadSprite(GetPackagePath() + "gfx\\frogator_attack.png", 4, 80, 80, 4, false);
-		this.m_tmrStand.SetDelay(1000);
-		this.m_tmrStand.Reset();
-		this.m_tmrStand.SetActive(true);
-		this.m_tmrMove.SetDelay(1000);
+		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\wolfdragon.png", 5, 391, 243, 1, false);
+		this.m_hAttackSound = S_QuerySound(GetPackagePath() + "sound\\laser.wav");
+		this.m_tmrMove.SetDelay(10);
 		this.m_tmrMove.Reset();
-		this.m_tmrMove.SetActive(false);
+		this.m_tmrMove.SetActive(true);
 		this.m_tmrDirChange.SetDelay(5000);
 		this.m_tmrDirChange.Reset();
 		this.m_tmrDirChange.SetActive(true);
@@ -168,15 +154,12 @@ class CFrogator : IScriptedEntity
 		this.m_tmrAttack.SetDelay(1500);
 		this.m_tmrAttack.Reset();
 		this.m_tmrAttack.SetActive(true);
-		this.m_tmrAttackAnim.SetDelay(500);
-		this.m_tmrAttackAnim.Reset();
-		this.m_tmrAttackAnim.SetActive(false);
 		this.m_tmrFlicker.SetDelay(250);
 		this.m_tmrFlicker.Reset();
 		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(50, 50), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hMove);
 	}
@@ -194,60 +177,34 @@ class CFrogator : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		if (this.m_tmrStand.IsActive()) {
-			this.m_tmrStand.Update();
-			if (this.m_tmrStand.IsElapsed()) {
-				this.m_tmrStand.SetActive(false);
-				this.m_tmrMove.Reset();
-				this.m_tmrMove.SetActive(true);
-				this.m_tmrSpriteChange.Reset();
-				this.m_tmrSpriteChange.SetActive(true);
-				this.m_iSpriteIndex = 0;
-			}
-		}
-
 		if (this.m_tmrMove.IsActive()) {
 			this.m_tmrMove.Update();
 
-			Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
-
 			if (this.m_tmrMove.IsElapsed()) {
-				this.m_tmrMove.SetActive(false);
-				this.m_tmrStand.Reset();
-				this.m_tmrStand.SetActive(true);
-				this.m_iSpriteIndex = 0;
+				this.m_tmrMove.Reset();
+
+				if (!this.m_bInAttackRange) {
+					Ent_Move(this, this.m_fSpeed, MOVE_FORWARD);
+				}
 			}
 		}
 
-		if (!this.m_tmrMove.IsActive()) {
+		if (!this.m_bGotEnemy) {
 			this.m_tmrDirChange.Update();
 			if (this.m_tmrDirChange.IsElapsed()) {
 				this.m_tmrDirChange.Reset();
-				if (!this.m_bGotEnemy)
-					this.m_fRotation = float(Util_Random(1, 360));
+				
+				this.m_fRotation = float(Util_Random(1, 360));
 			}
 		}
 
-		if (this.m_tmrMove.IsActive()) {
-			this.m_tmrSpriteChange.Update();
-			if (this.m_tmrSpriteChange.IsElapsed()) {
-				this.m_tmrSpriteChange.Reset();
+		this.m_tmrSpriteChange.Update();
+		if (this.m_tmrSpriteChange.IsElapsed()) {
+			this.m_tmrSpriteChange.Reset();
 
-				if (this.m_iSpriteIndex < 5) {
-					this.m_iSpriteIndex++;
-				}
-			}
-		}
-
-		if (this.m_tmrAttackAnim.IsActive()) {
-			this.m_tmrAttackAnim.Update();
-			if (this.m_tmrAttackAnim.IsElapsed()) {
-				this.m_tmrAttackAnim.Reset();
-
-				this.m_iSpriteAttackIndex++;
-				if (this.m_iSpriteAttackIndex >= 4) {
-					this.m_tmrAttackAnim.SetActive(false);
-				}
+			this.m_iSpriteIndex++;
+			if (this.m_iSpriteIndex >= 5) {
+				this.m_iSpriteIndex = 1;
 			}
 		}
 
@@ -294,11 +251,7 @@ class CFrogator : IScriptedEntity
 		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
 		bool bCustomColor = (this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0);
 
-		if (this.m_bInAttackRange) {
-			R_DrawSprite(this.m_hAttack, vOut, this.m_iSpriteAttackIndex, this.m_fRotation, Vector(-1, -1), 1.5f, 1.5f, bCustomColor, sDrawingColor);
-		} else {
-			R_DrawSprite(this.m_hMove, vOut, this.m_iSpriteIndex, this.m_fRotation, Vector(-1, -1), 1.5f, 1.5f, bCustomColor, sDrawingColor);
-		}
+		R_DrawSprite(this.m_hMove, vOut, this.m_iSpriteIndex, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -371,7 +324,7 @@ class CFrogator : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "frogator";
+		return "plasma_ball";
 	}
 	
 	//Return save game properties
@@ -389,7 +342,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 {
 	g_szPackagePath = szPath;
 
-	CFrogator @ent = CFrogator();
+	CWolfdragon @ent = CWolfdragon();
 	Ent_SpawnEntity(szIdent, @ent, vecPos);
 }
 
