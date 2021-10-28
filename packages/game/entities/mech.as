@@ -11,25 +11,22 @@
 	Released under the MIT license
 */
 
-#include "weapon_bolt.as"
-#include "blooddecal.as"
-#include "weapon_laserball.as"
+#include "weapon_laser.as"
+#include "explosion.as"
 
 string g_szPackagePath = "";
-const int C_WOLFDRAGON_REACT_RANGE = 500;
-const int C_WOLFDRAGON_ATTACK_RANGE = 300;
-const float C_WOLFDRAGON_DEFAULT_SPEED = 75.0;
+const int C_MECH_REACT_RANGE = 500;
+const int C_MECH_ATTACK_RANGE = 300;
+const float C_MECH_DEFAULT_SPEED = 65.0;
 
-/* Wolfdragon entity */
-class CWolfdragon : IScriptedEntity
+/* Mech entity */
+class CMech : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
 	float m_fRotation;
 	Model m_oModel;
 	SpriteHandle m_hMove;
-	int m_iSpriteIndex;
-	Timer m_tmrSpriteChange;
 	Timer m_tmrMayDamage;
 	Timer m_tmrAttack;
 	Timer m_tmrDirChange;
@@ -66,27 +63,24 @@ class CWolfdragon : IScriptedEntity
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;
 		
-		for (int i = 0; i < 5; i++) {
-			CLaserBallEntity@ ball = CLaserBallEntity();
+		for (int i = 0; i < 2; i++) {
+			CLaserEntity@ laser = CLaserEntity();
 
-			float fBallRot = this.GetRotation();
+			float fLaserRot = this.GetRotation();
 							
 			if (i == 0) {
-				fBallRot -= 0.3;
+				fLaserRot -= 0.1;
 			} else if (i == 1) {
-				fBallRot -= 0.2;
-			} else if (i == 3) {
-				fBallRot += 0.2;
-			} else if (i == 2) {
-				fBallRot += 0.3;
+				fLaserRot += 0.1;
 			}
 
-			ball.SetRotation(fBallRot);
-			ball.SetOwner(@this);
+			laser.SetRotation(fLaserRot);
+			laser.SetOwner(@this);
+			laser.RandomColor(true);
 
-			Vector vecBulletPos = Vector(this.m_vecPos[0] + 100, this.m_vecPos[1] + 100);
+			Vector vecBulletPos = Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 10);
 
-			Ent_SpawnEntity("weapon_laserball", ball, vecBulletPos);
+			Ent_SpawnEntity("weapon_laser", laser, vecBulletPos);
 		}
 
 		S_PlaySound(this.m_hAttackSound, S_GetCurrentVolume());
@@ -100,17 +94,17 @@ class CWolfdragon : IScriptedEntity
 		this.m_bInAttackRange = false;
 
 		IScriptedEntity@ pEntity = Ent_GetPlayerEntity();
-		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_WOLFDRAGON_REACT_RANGE) {
+		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_MECH_REACT_RANGE) {
 			this.m_bGotEnemy = true;
 		}
 		
 		if (this.m_bGotEnemy) {
-			if (this.m_fSpeed == C_WOLFDRAGON_DEFAULT_SPEED)
+			if (this.m_fSpeed == C_MECH_DEFAULT_SPEED)
 				this.m_fSpeed *= 2;
 				
 			this.LookAt(pEntity.GetPosition());
 
-			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_WOLFDRAGON_ATTACK_RANGE) {
+			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_MECH_ATTACK_RANGE) {
 				this.m_bInAttackRange = true;
 				this.m_tmrAttack.Update();
 				if (this.m_tmrAttack.IsElapsed()) {
@@ -123,12 +117,11 @@ class CWolfdragon : IScriptedEntity
 		}
 	}
 
-	CWolfdragon()
+	CMech()
     {
-		this.m_vecSize = Vector(128, 64);
-		this.m_iSpriteIndex = 0;
+		this.m_vecSize = Vector(118, 103);
 		this.m_bGotEnemy = this.m_bLastGotEnemy = false;
-		this.m_fSpeed = C_WOLFDRAGON_DEFAULT_SPEED;
+		this.m_fSpeed = C_MECH_DEFAULT_SPEED;
 		this.m_uiHealth = 90;
 		this.m_uiFlickerCount = 0;
     }
@@ -138,7 +131,7 @@ class CWolfdragon : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\wolfdragon.png", 5, 391, 243, 1, false);
+		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\mech.png", 1, 118, 103, 1, false);
 		this.m_hAttackSound = S_QuerySound(GetPackagePath() + "sound\\laser.wav");
 		this.m_tmrMove.SetDelay(10);
 		this.m_tmrMove.Reset();
@@ -146,9 +139,6 @@ class CWolfdragon : IScriptedEntity
 		this.m_tmrDirChange.SetDelay(5000);
 		this.m_tmrDirChange.Reset();
 		this.m_tmrDirChange.SetActive(true);
-		this.m_tmrSpriteChange.SetDelay(50);
-		this.m_tmrSpriteChange.Reset();
-		this.m_tmrSpriteChange.SetActive(false);
 		this.m_tmrAttack.SetDelay(1500);
 		this.m_tmrAttack.Reset();
 		this.m_tmrAttack.SetActive(true);
@@ -157,7 +147,7 @@ class CWolfdragon : IScriptedEntity
 		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(50, 50), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(10, 10), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hMove);
 	}
@@ -165,11 +155,8 @@ class CWolfdragon : IScriptedEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
-		CBloodSplash @obj = CBloodSplash();
-		Ent_SpawnEntity("blooddecal", @obj, this.m_vecPos);
-		
-		SoundHandle hSplash = S_QuerySound(GetPackagePath() + "sound\\hc_splash.wav");
-		S_PlaySound(hSplash, S_GetCurrentVolume());
+		CExplosionEntity @obj = CExplosionEntity();
+		Ent_SpawnEntity("explosion", @obj, this.m_vecPos);
 	}
 	
 	//Process entity stuff
@@ -193,16 +180,6 @@ class CWolfdragon : IScriptedEntity
 				this.m_tmrDirChange.Reset();
 				
 				this.m_fRotation = float(Util_Random(1, 360));
-			}
-		}
-
-		this.m_tmrSpriteChange.Update();
-		if (this.m_tmrSpriteChange.IsElapsed()) {
-			this.m_tmrSpriteChange.Reset();
-
-			this.m_iSpriteIndex++;
-			if (this.m_iSpriteIndex >= 5) {
-				this.m_iSpriteIndex = 1;
 			}
 		}
 
@@ -249,7 +226,7 @@ class CWolfdragon : IScriptedEntity
 		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
 		bool bCustomColor = (this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0);
 
-		R_DrawSprite(this.m_hMove, vOut, this.m_iSpriteIndex, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
+		R_DrawSprite(this.m_hMove, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -322,7 +299,7 @@ class CWolfdragon : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "wolfdragon";
+		return "mech";
 	}
 	
 	//Return save game properties
@@ -340,7 +317,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 {
 	g_szPackagePath = szPath;
 
-	CWolfdragon @ent = CWolfdragon();
+	CMech @ent = CMech();
 	Ent_SpawnEntity(szIdent, @ent, vecPos);
 }
 

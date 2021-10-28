@@ -27,11 +27,18 @@ class CLaserEntity : IScriptedEntity
 	bool m_bRemove;
 	Timer m_tmrAlive;
 	IScriptedEntity@ m_pOwner;
+	bool m_bRandomColor;
 	
 	//Set owner
 	void SetOwner(IScriptedEntity@ pOwner)
 	{
 		@this.m_pOwner = @pOwner;
+	}
+
+	//Random color flag
+	void RandomColor(bool value)
+	{
+		this.m_bRandomColor = value;
 	}
 	
 	CLaserEntity()
@@ -40,13 +47,18 @@ class CLaserEntity : IScriptedEntity
 		this.m_fSpeed = 650.0;
 		this.m_bRemove = false;
 		@this.m_pOwner = null;
+		this.m_bRandomColor = false;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
-		this.m_hLaser = R_LoadSprite(GetPackagePath() + "gfx\\laser.png", 1, 60, 99, 1, true);
+		if (this.m_bRandomColor) {
+			this.m_hLaser = R_LoadSprite(GetPackagePath() + "gfx\\laser\\laser" + formatInt(Util_Random(1, 5)) + ".png", 1, 60, 99, 1, true);
+		} else {
+			this.m_hLaser = R_LoadSprite(GetPackagePath() + "gfx\\laser\\laser1.png", 1, 60, 99, 1, true);
+		}
 		this.m_tmrAlive.SetDelay(10000);
 		this.m_tmrAlive.Reset();
 		this.m_tmrAlive.SetActive(true);
@@ -114,9 +126,13 @@ class CLaserEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() != "player") {
+		if (@ref != @this.m_pOwner) {
 			this.m_bRemove = true;
 			
+			if ((this.m_pOwner.GetName() != "player") && (ref.GetName() != "player")) {
+				return;
+			}
+
 			ref.OnDamage(LASER_SHOT_DAMAGE);
 			
 			if (ref.NeedsRemoval()) {
