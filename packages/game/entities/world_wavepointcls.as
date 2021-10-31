@@ -14,6 +14,8 @@
 #include "headcrabcls.as"
 #include "tankcls.as"
 #include "teslatowercls.as"
+#include "wolfdragoncls.as"
+#include "frogatorcls.as"
 
 /* Wave point entity */
 class CWavePoint : IScriptedEntity
@@ -69,7 +71,7 @@ class CWavePoint : IScriptedEntity
 	void SpawnWave()
 	{
 		for (size_t i = 0; i < this.m_uiEntCount; i++) {
-			Vector vecSpawnPos = Vector(this.m_vecPos[0] + Util_Random(0, 50) - 25, this.m_vecPos[1] + Util_Random(0, 50) - 25);
+			Vector vecSpawnPos = Vector(this.m_vecPos[0] + Util_Random(0, 100) - 50, this.m_vecPos[1] + Util_Random(0, 100) - 50);
 			
 			if (this.m_szTarget == "headcrab") {
 				CHeadcrabEntity@ ent = CHeadcrabEntity();
@@ -80,6 +82,12 @@ class CWavePoint : IScriptedEntity
 			} else if (this.m_szTarget == "teslatower") {
 				CTeslaTower@ ent = CTeslaTower();
 				Ent_SpawnEntity("teslatower", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "wolfdragon") {
+				CWolfdragon@ ent = CWolfdragon();
+				Ent_SpawnEntity("wolfdragon", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "frogator") {
+				CFrogator@ ent = CFrogator();
+				Ent_SpawnEntity("frogator", @ent, vecSpawnPos);
 			}
 		}
 	}

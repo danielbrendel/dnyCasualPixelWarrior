@@ -765,6 +765,8 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 {
 	g_szPackagePath = szPath;
 	
+	Ent_SetGoalActivationStatus(false);
+	
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
