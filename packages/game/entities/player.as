@@ -146,6 +146,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	MovementDir m_dodgeType;
 	uint m_uiDodgeCounter;
 	SoundHandle m_hDodge;
+	Timer m_tmrShowFlare;
+	SpriteHandle m_hMuzzle;
 	
 	CPlayerEntity()
     {
@@ -194,6 +196,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
 		}
 		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
+		this.m_hMuzzle = R_LoadSprite(GetPackagePath() + "gfx\\muzzle_turned.png", 1, 256, 256, 1, false);
 		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\dodge.wav");
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
@@ -213,6 +216,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrMayDodge.SetDelay(2500);
 		this.m_tmrMayDodge.Reset();
 		this.m_tmrMayDodge.SetActive(true);
+		this.m_tmrShowFlare.SetDelay(50);
+		this.m_tmrShowFlare.Reset();
+		this.m_tmrShowFlare.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -318,6 +324,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\handgun.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						this.m_tmrShowFlare.Reset();
+						this.m_tmrShowFlare.SetActive(true);
 					}
 				} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
 					if (HUD_GetAmmoItemCurrent("laser") > 0) {
@@ -356,6 +365,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\shotgun.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						this.m_tmrShowFlare.Reset();
+						this.m_tmrShowFlare.SetActive(true);
 					}
 				}
 			}
@@ -471,6 +483,14 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animIdleShotgun.Process();
 			}
 		}
+
+		//Muzzle flare
+		if (this.m_tmrShowFlare.IsActive()) {
+			this.m_tmrShowFlare.Update();
+			if (this.m_tmrShowFlare.IsElapsed()) {
+				this.m_tmrShowFlare.SetActive(false);
+			}
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -545,6 +565,17 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 
 		R_DrawString(R_GetDefaultFont(), formatInt(this.m_vecPos[0]) + "x" + formatInt(this.m_vecPos[1]), Vector(300, 20), Color(255,0,0,255));
+
+		if ((this.m_tmrShowFlare.IsActive()) && (!this.m_tmrShowFlare.IsElapsed())) {
+			Vector vecForward = Vector(Wnd_GetWindowCenterX() - 128, Wnd_GetWindowCenterY() - 128);
+			vecForward[0] += int(sin(this.GetRotation()) * 92);
+			vecForward[1] -= int(cos(this.GetRotation()) * 92);
+
+			vecForward[0] -= int(sin(this.GetRotation() + 80.0) * 20);
+			vecForward[1] += int(cos(this.GetRotation() + 80.0) * 20);
+
+			R_DrawSprite(this.m_hMuzzle, vecForward, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game
