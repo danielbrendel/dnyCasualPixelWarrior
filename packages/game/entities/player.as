@@ -310,6 +310,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				Vector vecBulletPos = this.m_vecPos;
 				vecBulletPos[0] += int(sin(this.GetRotation()) * 50);
 				vecBulletPos[1] -= int(cos(this.GetRotation()) * 50);
+				vecBulletPos[0] -= int(sin(this.GetRotation() + 80.0) * 20);
+				vecBulletPos[1] += int(cos(this.GetRotation() + 80.0) * 20);
 				
 				if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
 					if (HUD_GetAmmoItemCurrent("handgun") > 0) {
