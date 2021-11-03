@@ -104,6 +104,7 @@ const int BTN_TURNRIGHT = (1 << 5);
 const int BTN_SPEED = (1 << 6);
 const int BTN_ATTACK = (1 << 7);
 const int BTN_THROW = (1 << 8);
+const int BTN_DODGE = (1 << 9);
 const int WEAPON_HANDGUN = 1;
 const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
@@ -140,6 +141,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	int m_iScore;
 	SpriteHandle m_hCrosshair;
 	Vector m_vecCrosshair;
+	Timer m_tmrDoding;
+	Timer m_tmrMayDodge;
+	MovementDir m_dodgeType;
+	uint m_uiDodgeCounter;
+	SoundHandle m_hDodge;
 	
 	CPlayerEntity()
     {
@@ -153,6 +159,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_bMayThrow = true;
 		this.m_iScore = 0;
 		this.m_vecCrosshair = Vector(32, 32);
+		this.m_uiDodgeCounter = 0;
     }
 	
 	//Aim at screen view position
@@ -187,6 +194,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
 		}
 		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
+		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\dodge.wav");
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
@@ -199,6 +207,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrSteps.SetDelay(500);
 		this.m_tmrSteps.Reset();
 		this.m_tmrSteps.SetActive(false);
+		this.m_tmrDoding.SetDelay(10);
+		this.m_tmrDoding.Reset();
+		this.m_tmrDoding.SetActive(false);
+		this.m_tmrMayDodge.SetDelay(2500);
+		this.m_tmrMayDodge.Reset();
+		this.m_tmrMayDodge.SetActive(true);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -347,6 +361,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 		
+		//Process throwing
 		if ((this.m_uiButtons & BTN_THROW) == BTN_THROW) {
 			if (this.m_bMayThrow) {
 				this.m_bMayThrow = false;
@@ -359,6 +374,46 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 					Ent_SpawnEntity("weapon_grenade", @grenade, this.m_vecPos);
 					
 					HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") - 1);
+				}
+			}
+		}
+
+		//Proess dodging
+
+		if ((this.m_uiButtons & BTN_DODGE) == BTN_DODGE) {
+			if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
+				if (this.m_tmrMayDodge.IsElapsed()) {
+					this.m_tmrDoding.Reset();
+					this.m_tmrDoding.SetActive(true);
+					this.m_tmrMayDodge.Reset();
+					this.m_dodgeType = MOVE_FORWARD;
+					S_PlaySound(this.m_hDodge, S_GetCurrentVolume());
+				}
+			} else if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
+				if (this.m_tmrMayDodge.IsElapsed()) {
+					this.m_tmrDoding.Reset();
+					this.m_tmrDoding.SetActive(true);
+					this.m_tmrMayDodge.Reset();
+					this.m_dodgeType = MOVE_BACKWARD;
+					S_PlaySound(this.m_hDodge, S_GetCurrentVolume());
+				}
+			}
+
+			this.m_uiButtons &= ~BTN_DODGE;
+		}
+
+		if (this.m_tmrMayDodge.IsActive()) {
+			this.m_tmrMayDodge.Update();
+		}
+
+		if (this.m_tmrDoding.IsActive()) {
+			this.m_tmrDoding.Update();
+			if (this.m_tmrDoding.IsElapsed()) {
+				Ent_Move(this, PLAYER_SPEED * 3, this.m_dodgeType);
+				this.m_uiDodgeCounter++;
+				if (this.m_uiDodgeCounter >= 5) {
+					this.m_tmrDoding.SetActive(false);
+					this.m_uiDodgeCounter = 0;
 				}
 			}
 		}
@@ -653,14 +708,14 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 		
-		if (vKey == GetKeyBinding("ATTACK")) {
+		if (vKey == GetKeyBinding("DODGE")) {
 			if (bDown) {
-				if (!((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK)) {
-					this.m_uiButtons |= BTN_ATTACK;
+				if (!((this.m_uiButtons & BTN_DODGE) == BTN_DODGE)) {
+					this.m_uiButtons |= BTN_DODGE;
 				}
 			} else {
-				if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
-					this.m_uiButtons &= ~BTN_ATTACK;
+				if ((this.m_uiButtons & BTN_DODGE) == BTN_DODGE) {
+					this.m_uiButtons &= ~BTN_DODGE;
 				}
 			}
 		}
