@@ -11,15 +11,18 @@
 	Released under the MIT license
 */
 
+#include "weapon_laserball.as"
+#include "weapon_laser.as"
 #include "weapon_missile.as"
-#include "explosion.as"
+#include "weapon_bolt.as"
+#include "bigexplosion.as"
 
-const int C_ALIENINFANTRY_REACT_RANGE = 500;
-const int C_ALIENINFANTRY_ATTACK_RANGE = 300;
-const float C_ALIENINFANTRY_DEFAULT_SPEED = 65.0;
+const int C_ALIENBOSS_REACT_RANGE = 550;
+const int C_ALIENBOSS_ATTACK_RANGE = 500;
+const float C_ALIENBOSS_DEFAULT_SPEED = 65.0;
 
-/* Alien infantry entity */
-class CAlienInfantry : IScriptedEntity
+/* Alien boss entity */
+class CAlienBoss : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
@@ -33,11 +36,14 @@ class CAlienInfantry : IScriptedEntity
 	Timer m_tmrFlicker;
 	bool m_bGotEnemy;
 	float m_fSpeed;
-	SoundHandle m_hAttackSound;
+	SoundHandle m_hLaserSound;
+	SoundHandle m_hMissileSound;
+	SoundHandle m_hBoltSound;
 	bool m_bLastGotEnemy;
 	bool m_bInAttackRange;
 	uint32 m_uiHealth;
 	uint m_uiFlickerCount;
+	FontHandle m_hBossFont;
 
 	void LookAt(const Vector &in vPos)
 	{
@@ -55,19 +61,148 @@ class CAlienInfantry : IScriptedEntity
 		return fAngle - 6.30 / 4;
 	}
 
-	void Fire(IScriptedEntity@ pEntity)
+	void FireLaserBall(IScriptedEntity@ pEntity)
 	{
-		//Fire missile
-		
+		//Fire laser ball
+
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;
 		
-		CMissileEntity @missile = CMissileEntity();
-		missile.SetRotation(this.m_fRotation);
+		for (int i = 0; i < 5; i++) {
+			CLaserBallEntity@ ball = CLaserBallEntity();
 
-		Ent_SpawnEntity("weapon_missile", missile, this.m_vecPos);
+			float fBallRot = this.GetRotation();
+							
+			if (i == 0) {
+				fBallRot -= 0.3;
+			} else if (i == 1) {
+				fBallRot -= 0.2;
+			} else if (i == 3) {
+				fBallRot += 0.2;
+			} else if (i == 2) {
+				fBallRot += 0.3;
+			}
 
-		S_PlaySound(this.m_hAttackSound, S_GetCurrentVolume());
+			ball.SetRotation(fBallRot);
+			ball.SetOwner(@this);
+
+			Ent_SpawnEntity("weapon_laserball", ball, this.m_vecPos);
+		}
+
+		S_PlaySound(this.m_hLaserSound, S_GetCurrentVolume());
+	}
+
+	void FireLaser(IScriptedEntity@ pEntity)
+	{
+		//Fire laser
+
+		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
+			return;
+		
+		for (int i = 0; i < 5; i++) {
+			CLaserEntity@ laser = CLaserEntity();
+
+			float fLaserRot = this.GetRotation();
+							
+			if (i == 0) {
+				fLaserRot -= 0.2;
+			} else if (i == 1) {
+				fLaserRot -= 0.1;
+			} else if (i == 2) {
+				fLaserRot += 0.0;
+			} else if (i == 3) {
+				fLaserRot += 0.1;
+			} else if (i == 4) {
+				fLaserRot += 0.2;
+			}
+
+			laser.SetRotation(fLaserRot);
+			laser.SetOwner(@this);
+			laser.RandomColor(true);
+
+			Vector vecBulletPos = Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 10);
+
+			Ent_SpawnEntity("weapon_laser", laser, vecBulletPos);
+		}
+
+		S_PlaySound(this.m_hLaserSound, S_GetCurrentVolume());
+	}
+
+	void FireMissile(IScriptedEntity@ pEntity)
+	{
+		//Fire missile
+
+		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
+			return;
+		
+		for (int i = 0; i < 5; i++) {
+			CMissileEntity @missile = CMissileEntity();
+
+			float fMissileRot = this.GetRotation();
+							
+			if (i == 0) {
+				fMissileRot -= 0.2;
+			} else if (i == 1) {
+				fMissileRot -= 0.1;
+			} else if (i == 2) {
+				fMissileRot += 0.0;
+			} else if (i == 3) {
+				fMissileRot += 0.1;
+			} else if (i == 4) {
+				fMissileRot += 0.2;
+			}
+
+			missile.SetRotation(fMissileRot);
+
+			Ent_SpawnEntity("weapon_missile", missile, this.m_vecPos);
+		}
+
+		S_PlaySound(this.m_hMissileSound, S_GetCurrentVolume());
+	}
+
+	void FireBolt(IScriptedEntity@ pEntity)
+	{
+		//Fire bolt
+
+		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
+			return;
+		
+		CBoltEntity@ obj = CBoltEntity();
+		
+		Vector vTargetPos = pEntity.GetPosition();
+		Vector vTargetCenter = pEntity.GetModel().GetCenter();
+		Vector vAbsTargetPos = Vector(vTargetPos[0] + vTargetCenter[0], vTargetPos[1] + vTargetCenter[1]);
+		
+		obj.SetRotation(this.GetAimRotation(vAbsTargetPos));
+		obj.SetTarget(pEntity);
+		
+		Ent_SpawnEntity("weapon_bolt", @obj, Vector(this.m_vecPos[0] + 35, this.m_vecPos[1] + 130));
+
+		S_PlaySound(this.m_hBoltSound, 10);
+	}
+
+	void Fire(IScriptedEntity@ pEntity)
+	{
+		//Fire lightning
+		
+		int iRndValue = Util_Random(1, 5);
+		switch (iRndValue) {
+			case 1:
+				this.FireLaserBall(@pEntity);
+				break;
+			case 2:
+				this.FireLaser(@pEntity);
+				break;
+			case 3:
+				this.FireMissile(@pEntity);
+				break;
+			case 4:
+				this.FireBolt(@pEntity);
+				break;
+			default:
+				this.FireLaserBall(@pEntity);
+				break;
+		}
 	}
 	
 	void CheckForEnemiesInRange()
@@ -78,17 +213,17 @@ class CAlienInfantry : IScriptedEntity
 		this.m_bInAttackRange = false;
 
 		IScriptedEntity@ pEntity = Ent_GetPlayerEntity();
-		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_ALIENINFANTRY_REACT_RANGE) {
+		if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_ALIENBOSS_REACT_RANGE) {
 			this.m_bGotEnemy = true;
 		}
 		
 		if (this.m_bGotEnemy) {
-			if (this.m_fSpeed == C_ALIENINFANTRY_DEFAULT_SPEED)
+			if (this.m_fSpeed == C_ALIENBOSS_DEFAULT_SPEED)
 				this.m_fSpeed *= 2;
 				
 			this.LookAt(pEntity.GetPosition());
 
-			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_ALIENINFANTRY_ATTACK_RANGE) {
+			if (this.m_vecPos.Distance(pEntity.GetPosition()) <= C_ALIENBOSS_ATTACK_RANGE) {
 				this.m_bInAttackRange = true;
 				this.m_tmrAttack.Update();
 				if (this.m_tmrAttack.IsElapsed()) {
@@ -101,12 +236,12 @@ class CAlienInfantry : IScriptedEntity
 		}
 	}
 
-	CAlienInfantry()
+	CAlienBoss()
     {
-		this.m_vecSize = Vector(39, 43);
+		this.m_vecSize = Vector(288, 321);
 		this.m_bGotEnemy = this.m_bLastGotEnemy = false;
-		this.m_fSpeed = C_ALIENINFANTRY_DEFAULT_SPEED;
-		this.m_uiHealth = 35;
+		this.m_fSpeed = C_ALIENBOSS_DEFAULT_SPEED;
+		this.m_uiHealth = 200;
 		this.m_uiFlickerCount = 0;
     }
 	
@@ -115,15 +250,18 @@ class CAlienInfantry : IScriptedEntity
 	{
 		this.m_vecPos = vec;
 		this.m_fRotation = 0.0f;
-		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\alieninfantry.png", 1, 39, 43, 1, false);
-		this.m_hAttackSound = S_QuerySound(GetPackagePath() + "sound\\missile_launch.wav");
+		this.m_hMove = R_LoadSprite(GetPackagePath() + "gfx\\alienboss.png", 1, 288, 321, 1, false);
+		this.m_hLaserSound = S_QuerySound(GetPackagePath() + "sound\\laser.wav");
+		this.m_hMissileSound = S_QuerySound(GetPackagePath() + "sound\\missile_launch.wav");
+		this.m_hBoltSound = S_QuerySound(GetPackagePath() + "sound\\tesla_attack.wav");
+		this.m_hBossFont = R_LoadFont("Arial", 21, 45);
 		this.m_tmrMove.SetDelay(10);
 		this.m_tmrMove.Reset();
 		this.m_tmrMove.SetActive(true);
 		this.m_tmrDirChange.SetDelay(5000);
 		this.m_tmrDirChange.Reset();
 		this.m_tmrDirChange.SetActive(true);
-		this.m_tmrAttack.SetDelay(1500);
+		this.m_tmrAttack.SetDelay(1000);
 		this.m_tmrAttack.Reset();
 		this.m_tmrAttack.SetActive(true);
 		this.m_tmrFlicker.SetDelay(250);
@@ -131,7 +269,7 @@ class CAlienInfantry : IScriptedEntity
 		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(10, 10), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hMove);
 	}
@@ -139,8 +277,8 @@ class CAlienInfantry : IScriptedEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
-		CExplosionEntity @obj = CExplosionEntity();
-		Ent_SpawnEntity("explosion", @obj, this.m_vecPos);
+		CBigExplosionEntity @obj = CBigExplosionEntity();
+		Ent_SpawnEntity("bigexplosion", @obj, this.m_vecPos);
 	}
 	
 	//Process entity stuff
@@ -210,7 +348,24 @@ class CAlienInfantry : IScriptedEntity
 		Color sDrawingColor = (this.m_tmrFlicker.IsActive()) ? Color(255, 0, 0, 150) : Color(0, 0, 0, 0);
 		bool bCustomColor = (this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0);
 
-		R_DrawSprite(this.m_hMove, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.0f, 0.0f, bCustomColor, sDrawingColor);
+		R_DrawSprite(this.m_hMove, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
+
+		const int iHealtMaxhWidth = 300;
+		const int iMaxHealth = 200;
+
+		if (this.m_uiHealth > 0) {
+			int iHealthBarWidth = int(this.m_uiHealth) * iHealtMaxhWidth / 100;
+
+			Color sBarColor = Color(0, 255, 0, 255);
+			if ((this.m_uiHealth < 120) && (this.m_uiHealth >= 55)) {
+				sBarColor = Color(150, 150, 0, 150);
+			} else if (this.m_uiHealth < 55) {
+				sBarColor = Color(250, 0, 0, 150);
+			}
+
+			R_DrawFilledBox(Vector(Wnd_GetWindowCenterX() - iHealtMaxhWidth / 2 - 100, Wnd_GetWindowCenterY() * 2 - 100), Vector(iHealthBarWidth, 50), sBarColor);
+			R_DrawString(this.m_hBossFont, "BOSS", Vector(Wnd_GetWindowCenterX() - iHealtMaxhWidth / 2 - 100 + 2, Wnd_GetWindowCenterY() * 2 - 100), Color(200, 200, 200, 255));
+		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -283,7 +438,7 @@ class CAlienInfantry : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "alieninfantry";
+		return "alienboss";
 	}
 	
 	//Return save game properties

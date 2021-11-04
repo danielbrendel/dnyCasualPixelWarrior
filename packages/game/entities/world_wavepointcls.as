@@ -20,6 +20,7 @@
 #include "helicoptercls.as"
 #include "alieninfantrycls.as"
 #include "alienvehiclecls.as"
+#include "alienbosscls.as"
 
 /* Wave point entity */
 class CWavePoint : IScriptedEntity
@@ -104,6 +105,9 @@ class CWavePoint : IScriptedEntity
 			} else if (this.m_szTarget == "alienvehicle") {
 				CAlienVehicle@ ent = CAlienVehicle();
 				Ent_SpawnEntity("alienvehicle", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "alienboss") {
+				CAlienBoss@ ent = CAlienBoss();
+				Ent_SpawnEntity("alienboss", @ent, vecSpawnPos);
 			}
 		}
 	}

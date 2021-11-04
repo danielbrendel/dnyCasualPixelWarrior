@@ -57,7 +57,7 @@ class CAlienVehicle : IScriptedEntity
 
 	void Fire(IScriptedEntity@ pEntity)
 	{
-		//Fire lightning
+		//Fire laser ball
 		
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;
@@ -299,7 +299,7 @@ class CAlienVehicle : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "mech";
+		return "alienvehicle";
 	}
 	
 	//Return save game properties

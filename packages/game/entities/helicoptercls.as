@@ -61,7 +61,7 @@ class CHelicopter : IScriptedEntity
 
 	void Fire(IScriptedEntity@ pEntity)
 	{
-		//Fire lightning
+		//Fire missile
 		
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;

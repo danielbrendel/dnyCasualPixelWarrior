@@ -57,7 +57,7 @@ class CMech : IScriptedEntity
 
 	void Fire(IScriptedEntity@ pEntity)
 	{
-		//Fire lightning
+		//Fire laser
 		
 		if ((@pEntity == null) || (!Ent_IsValid(pEntity)))
 			return;
