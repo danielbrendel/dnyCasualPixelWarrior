@@ -13,11 +13,11 @@
 
 #include "explosion.as"
 
-const uint32 LASER_SHOT_DAMAGE = 20;
-
 /* Laser entity */
 class CLaserEntity : IScriptedEntity
 {
+	uint32 LASER_SHOT_DAMAGE = 20;
+
 	Vector m_vecPos;
 	Vector m_vecSize;
 	Model m_oModel;

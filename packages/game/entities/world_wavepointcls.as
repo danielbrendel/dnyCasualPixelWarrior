@@ -16,6 +16,10 @@
 #include "teslatowercls.as"
 #include "wolfdragoncls.as"
 #include "frogatorcls.as"
+#include "mechcls.as"
+#include "helicoptercls.as"
+#include "alieninfantrycls.as"
+#include "alienvehiclecls.as"
 
 /* Wave point entity */
 class CWavePoint : IScriptedEntity
@@ -71,7 +75,7 @@ class CWavePoint : IScriptedEntity
 	void SpawnWave()
 	{
 		for (size_t i = 0; i < this.m_uiEntCount; i++) {
-			Vector vecSpawnPos = Vector(this.m_vecPos[0] + Util_Random(0, 100) - 50, this.m_vecPos[1] + Util_Random(0, 100) - 50);
+			Vector vecSpawnPos = Vector(this.m_vecPos[0] + Util_Random(0, 200) - 100, this.m_vecPos[1] + Util_Random(0, 200) - 100);
 			
 			if (this.m_szTarget == "headcrab") {
 				CHeadcrabEntity@ ent = CHeadcrabEntity();
@@ -88,6 +92,18 @@ class CWavePoint : IScriptedEntity
 			} else if (this.m_szTarget == "frogator") {
 				CFrogator@ ent = CFrogator();
 				Ent_SpawnEntity("frogator", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "mech") {
+				CMech@ ent = CMech();
+				Ent_SpawnEntity("mech", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "helicopter") {
+				CHelicopter@ ent = CHelicopter();
+				Ent_SpawnEntity("helicopter", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "alieninfantry") {
+				CAlienInfantry@ ent = CAlienInfantry();
+				Ent_SpawnEntity("alieninfantry", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "alienvehicle") {
+				CAlienVehicle@ ent = CAlienVehicle();
+				Ent_SpawnEntity("alienvehicle", @ent, vecSpawnPos);
 			}
 		}
 	}
