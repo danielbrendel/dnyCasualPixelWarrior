@@ -12,6 +12,7 @@
 */
 
 #include "weapon_missile.as"
+#include "item_coin.as"
 
 const int C_HELICOPTER_REACT_RANGE = 500;
 const int C_HELICOPTER_ATTACK_RANGE = 300;
@@ -167,6 +168,12 @@ class CHelicopter : IScriptedEntity
 	{
 		CExplosionEntity@ expl = CExplosionEntity();
 		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
+
+		for (int i = 0; i < 3; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

@@ -13,6 +13,7 @@
 
 #include "blooddecal.as"
 #include "weapon_laserball.as"
+#include "item_coin.as"
 
 const int C_WOLFDRAGON_REACT_RANGE = 500;
 const int C_WOLFDRAGON_ATTACK_RANGE = 300;
@@ -168,6 +169,12 @@ class CWolfdragon : IScriptedEntity
 		
 		SoundHandle hSplash = S_QuerySound(GetPackagePath() + "sound\\hc_splash.wav");
 		S_PlaySound(hSplash, S_GetCurrentVolume());
+
+		for (int i = 0; i < 3; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

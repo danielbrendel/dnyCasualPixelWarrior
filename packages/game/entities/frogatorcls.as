@@ -13,6 +13,7 @@
 
 #include "weapon_bolt.as"
 #include "blooddecal.as"
+#include "item_coin.as"
 
 const int C_FROGATOR_REACT_RANGE = 500;
 const int C_FROGATOR_ATTACK_RANGE = 200;
@@ -188,6 +189,12 @@ class CFrogator : IScriptedEntity
 		
 		SoundHandle hSplash = S_QuerySound(GetPackagePath() + "sound\\hc_splash.wav");
 		S_PlaySound(hSplash, S_GetCurrentVolume());
+
+		for (int i = 0; i < 2; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

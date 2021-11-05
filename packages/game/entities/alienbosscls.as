@@ -16,6 +16,7 @@
 #include "weapon_missile.as"
 #include "weapon_bolt.as"
 #include "bigexplosion.as"
+#include "item_coin.as"
 
 const int C_ALIENBOSS_REACT_RANGE = 550;
 const int C_ALIENBOSS_ATTACK_RANGE = 500;
@@ -279,6 +280,12 @@ class CAlienBoss : IScriptedEntity
 	{
 		CBigExplosionEntity @obj = CBigExplosionEntity();
 		Ent_SpawnEntity("bigexplosion", @obj, this.m_vecPos);
+
+		for (int i = 0; i < 20; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

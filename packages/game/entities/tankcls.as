@@ -13,6 +13,7 @@
 
 #include "weapon_gun.as"
 #include "explosion.as"
+#include "item_coin.as"
 
 /* Tank entity */
 class CTankEntity : IScriptedEntity
@@ -112,6 +113,12 @@ class CTankEntity : IScriptedEntity
 	{
 		CExplosionEntity @expl = CExplosionEntity();
 		Ent_SpawnEntity("explosion", @expl, this.m_vecPos);
+
+		for (int i = 0; i < 4; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

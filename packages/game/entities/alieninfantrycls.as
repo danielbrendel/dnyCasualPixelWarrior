@@ -13,6 +13,7 @@
 
 #include "weapon_missile.as"
 #include "explosion.as"
+#include "item_coin.as"
 
 const int C_ALIENINFANTRY_REACT_RANGE = 500;
 const int C_ALIENINFANTRY_ATTACK_RANGE = 300;
@@ -141,6 +142,12 @@ class CAlienInfantry : IScriptedEntity
 	{
 		CExplosionEntity @obj = CExplosionEntity();
 		Ent_SpawnEntity("explosion", @obj, this.m_vecPos);
+
+		for (int i = 0; i < 2; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

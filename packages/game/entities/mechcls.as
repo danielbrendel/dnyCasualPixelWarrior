@@ -13,6 +13,7 @@
 
 #include "weapon_laser.as"
 #include "explosion.as"
+#include "item_coin.as"
 
 const int C_MECH_REACT_RANGE = 500;
 const int C_MECH_ATTACK_RANGE = 300;
@@ -156,6 +157,12 @@ class CMech : IScriptedEntity
 	{
 		CExplosionEntity @obj = CExplosionEntity();
 		Ent_SpawnEntity("explosion", @obj, this.m_vecPos);
+
+		for (int i = 0; i < 4; i++) {
+			CCoinItem@ coin = CCoinItem();
+			coin.SetRandomPos(true);
+			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+		}
 	}
 	
 	//Process entity stuff

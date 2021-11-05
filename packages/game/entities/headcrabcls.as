@@ -12,6 +12,7 @@
 */
 
 #include "blooddecal.as"
+#include "item_coin.as"
 
 const float C_HEADCRAB_DEFAULT_SPEED = 350;
 const int C_HEADCRAB_REACT_RANGE = 500;
@@ -140,6 +141,10 @@ class CHeadcrabEntity : IScriptedEntity
 		
 		SoundHandle hSplash = S_QuerySound(GetPackagePath() + "sound\\hc_splash.wav");
 		S_PlaySound(hSplash, S_GetCurrentVolume());
+
+		CCoinItem@ coin = CCoinItem();
+		coin.SetRandomPos(true);
+		Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
 	}
 	
 	//Process entity stuff

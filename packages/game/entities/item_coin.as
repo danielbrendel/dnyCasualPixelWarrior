@@ -22,18 +22,31 @@ class CCoinItem : IScriptedEntity
 	int m_iSpriteIndex;
 	bool m_bRemove;
 	SoundHandle m_hCollect;
+	bool m_bRandomPos;
 	
+	void SetRandomPos(bool value)
+	{
+		//Set random pos flag
+
+		this.m_bRandomPos = value;
+	}
+
 	CCoinItem()
     {
 		this.m_vecSize = Vector(40, 43);
 		this.m_iSpriteIndex = 0;
 		this.m_bRemove = false;
+		this.m_bRandomPos = false;
     }
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
+		if (this.m_bRandomPos) {
+			this.m_vecPos[0] += Util_Random(0, 100) - 50;
+			this.m_vecPos[1] += Util_Random(0, 100) - 50;
+		}
 		this.m_hSprite = R_LoadSprite(GetPackagePath() + "gfx\\coins.png", 4, this.m_vecSize[0], this.m_vecSize[1], 1, false);
 		this.m_tmrSpriteChange.SetDelay(200);
 		this.m_tmrSpriteChange.Reset();
@@ -170,8 +183,8 @@ class CCoinItem : IScriptedEntity
 }
 
 //Create coin entity
-void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
+/*void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
 	CCoinItem @coin = CCoinItem();
 	Ent_SpawnEntity(szIdent, @coin, vecPos);
-}
+}*/
