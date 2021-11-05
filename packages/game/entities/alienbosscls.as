@@ -281,7 +281,7 @@ class CAlienBoss : IScriptedEntity
 		CBigExplosionEntity @obj = CBigExplosionEntity();
 		Ent_SpawnEntity("bigexplosion", @obj, this.m_vecPos);
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 32; i++) {
 			CCoinItem@ coin = CCoinItem();
 			coin.SetRandomPos(true);
 			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);

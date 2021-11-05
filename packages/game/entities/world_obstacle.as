@@ -27,7 +27,7 @@ class CWorldObstacle : IScriptedEntity
 	
 	CWorldObstacle()
     {
-		this.m_vecSize = Vector(32, 32);
+		this.m_vecSize = Vector(64, 64);
 		this.m_bPlaySound = true;
     }
 	
@@ -125,15 +125,17 @@ class CWorldObstacle : IScriptedEntity
 	//Called for entity collisions
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		ref.OnDamage(this.m_uiDamageValue);
-		
-		if (this.m_bPlaySound) {
-			S_PlaySound(this.m_hDamage, S_GetCurrentVolume());
-		
-			this.m_bPlaySound = false;
+		if (ref.GetName() == "player") {
+			ref.OnDamage(this.m_uiDamageValue);
 			
-			this.m_tmrPlaySound.Reset();
-			this.m_tmrPlaySound.SetActive(true);
+			if (this.m_bPlaySound) {
+				S_PlaySound(this.m_hDamage, S_GetCurrentVolume());
+			
+				this.m_bPlaySound = false;
+				
+				this.m_tmrPlaySound.Reset();
+				this.m_tmrPlaySound.SetActive(true);
+			}
 		}
 	}
 	
