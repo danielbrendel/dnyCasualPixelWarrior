@@ -108,6 +108,7 @@ const int BTN_DODGE = (1 << 9);
 const int WEAPON_HANDGUN = 1;
 const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
+const uint GAME_COUNTER_MAX = 5;
 /* Player entity manager */
 class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 {
@@ -148,6 +149,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	SoundHandle m_hDodge;
 	Timer m_tmrShowFlare;
 	SpriteHandle m_hMuzzle;
+	Timer m_tmrGameCounter;
+	uint m_uiGameCounter;
+	Timer m_tmrGoInfo;
+	FontHandle m_hGameInfoFont;
 	
 	CPlayerEntity()
     {
@@ -162,6 +167,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_iScore = 0;
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
+
+		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
     }
 	
 	//Aim at screen view position
@@ -198,6 +205,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 		this.m_hMuzzle = R_LoadSprite(GetPackagePath() + "gfx\\muzzle_turned.png", 1, 256, 256, 1, false);
 		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\dodge.wav");
+		this.m_hGameInfoFont = R_LoadFont("Verdana", 21, 45);
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
@@ -219,6 +227,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrShowFlare.SetDelay(50);
 		this.m_tmrShowFlare.Reset();
 		this.m_tmrShowFlare.SetActive(false);
+		this.m_tmrGameCounter.SetDelay(1000);
+		this.m_tmrGameCounter.Reset();
+		this.m_tmrGameCounter.SetActive(true);
+		this.m_tmrGoInfo.SetDelay(1500);
+		CVar_SetBool("game_started", false);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -235,6 +248,31 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		//Process game counter
+		if (this.m_tmrGameCounter.IsActive()) {
+			this.m_tmrGameCounter.Update();
+			if (this.m_tmrGameCounter.IsElapsed()) {
+				this.m_uiGameCounter++;
+				if (this.m_uiGameCounter >= GAME_COUNTER_MAX) {
+					this.m_tmrGameCounter.SetActive(false);
+					this.m_tmrGoInfo.Reset();
+					this.m_tmrGoInfo.SetActive(true);
+				}
+			}
+		}
+
+		if (this.m_uiGameCounter < GAME_COUNTER_MAX) {
+			return;
+		}
+
+		if (this.m_tmrGoInfo.IsActive()) {
+			this.m_tmrGoInfo.Update();
+			if (this.m_tmrGoInfo.IsElapsed()) {
+				this.m_tmrGoInfo.SetActive(false);
+				CVar_SetBool("game_started", true);
+			}
+		}
+
 		//Process movement
 
 		this.m_bMoving = false;
@@ -578,6 +616,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 			R_DrawSprite(this.m_hMuzzle, vecForward, 0, this.m_fRotation, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 		}
+
+		if (this.m_tmrGameCounter.IsActive()) {
+			R_DrawString(this.m_hGameInfoFont, formatInt(GAME_COUNTER_MAX - this.m_uiGameCounter), Vector(Wnd_GetWindowCenterX() - 10, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
+		} else if (this.m_tmrGoInfo.IsActive()) {
+			R_DrawString(this.m_hGameInfoFont, _("app.go", "GO!"), Vector(Wnd_GetWindowCenterX() - 30, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
+		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -677,6 +721,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
+		if (this.m_tmrGameCounter.IsActive()) {
+			return;
+		}
+		
 		if (vKey == GetKeyBinding("TURN_LEFT")) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_TURNLEFT) == BTN_TURNLEFT)) {
@@ -782,6 +830,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for mouse presses
 	void OnMousePress(int key, bool bDown)
 	{
+		if (this.m_tmrGameCounter.IsActive()) {
+			return;
+		}
+
 		if (key == 1) {
 			if (bDown) {
 				if (!((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK)) {

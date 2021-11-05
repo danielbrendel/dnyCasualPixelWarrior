@@ -28,7 +28,15 @@ class CWaveMonitor : IScriptedEntity
 	{
 		return Ent_GetEntityNameCount("headcrab") == 0
 			&& Ent_GetEntityNameCount("tank") == 0
-			&& Ent_GetEntityNameCount("teslatower") == 0;
+			&& Ent_GetEntityNameCount("teslatower") == 0
+			&& Ent_GetEntityNameCount("frogator") == 0
+			&& Ent_GetEntityNameCount("wolfdragon") == 0
+			&& Ent_GetEntityNameCount("helicopter") == 0
+			&& Ent_GetEntityNameCount("alieninfantry") == 0
+			&& Ent_GetEntityNameCount("alienvehicle") == 0
+			&& Ent_GetEntityNameCount("ballista") == 0
+			&& Ent_GetEntityNameCount("mech") == 0
+			&& Ent_GetEntityNameCount("alienboss") == 0;
 	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
@@ -58,7 +66,7 @@ class CWaveMonitor : IScriptedEntity
 				if (this.AllOpponentsDefeated()) {
 					this.m_tmrMonitor.SetActive(false);
 					Ent_SetGoalActivationStatus(true);
-					HUD_AddMessage(_("app.all_opponents_defeated", "All opponents defeated. Portal is now open!"), HUD_MSG_COLOR_GREEN);
+					HUD_AddMessage(_("app.potal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
 				}
 			}
 		}

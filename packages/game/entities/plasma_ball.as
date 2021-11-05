@@ -59,6 +59,10 @@ class CPlasmaBall : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("game_started", false) == false) {
+			return;
+		}
+		
 		this.m_tmrSpriteChange.Update();
 		if (this.m_tmrSpriteChange.IsElapsed()) {
 			this.m_tmrSpriteChange.Reset();

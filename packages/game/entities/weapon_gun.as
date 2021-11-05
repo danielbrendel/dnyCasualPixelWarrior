@@ -13,7 +13,7 @@
 
 #include "explosion.as"
 
-const uint32 GUN_SHOT_DAMAGE = 10;
+const uint32 GUN_SHOT_DAMAGE = 25;
 
 /* Gun entity  */
 class CGunEntity : IScriptedEntity
@@ -112,18 +112,8 @@ class CGunEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (@ref != @this.m_pOwner) {
-			if ((ref.GetName() != "tank") && (ref.GetName() != "teslatower")) {
-				ref.OnDamage(GUN_SHOT_DAMAGE);
-			}
-			
-			if (ref.NeedsRemoval()) {
-				if (@this.m_pOwner == @Ent_GetPlayerEntity()) {
-					IPlayerEntity@ casted = cast<IPlayerEntity>(this.m_pOwner);
-					
-					casted.AddPlayerScore(1);
-				}
-			}
+		if ((@ref != @this.m_pOwner) && (ref.GetName() != this.GetName()) && (ref.GetName() != "weapon_laser") && (ref.GetName() != "item_coin") && (ref.GetName() != "item_health")) {
+			ref.OnDamage(GUN_SHOT_DAMAGE);
 			
 			this.m_bRemove = true;
 		}

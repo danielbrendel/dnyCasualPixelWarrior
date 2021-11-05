@@ -13,6 +13,7 @@
 
 #include "headcrabcls.as"
 #include "tankcls.as"
+#include "ballistacls.as"
 #include "teslatowercls.as"
 #include "wolfdragoncls.as"
 #include "frogatorcls.as"
@@ -35,11 +36,13 @@ class CWavePoint : IScriptedEntity
 	uint32 m_uiWaveDelay;
 	Timer m_tmrSpawnWave;
 	bool m_bRemove;
+	bool m_bInitialWave;
 	
 	CWavePoint()
     {
 		this.m_uiCurCount = 0;
 		this.m_bRemove = false;
+		this.m_bInitialWave = false;
     }
 	
 	//Set target entity type
@@ -84,6 +87,9 @@ class CWavePoint : IScriptedEntity
 			} else if (this.m_szTarget == "tank") {
 				CTankEntity@ ent = CTankEntity();
 				Ent_SpawnEntity("tank", @ent, vecSpawnPos);
+			} else if (this.m_szTarget == "ballista") {
+				CBallista@ ent = CBallista();
+				Ent_SpawnEntity("ballista", @ent, vecSpawnPos);
 			} else if (this.m_szTarget == "teslatower") {
 				CTeslaTower@ ent = CTeslaTower();
 				Ent_SpawnEntity("teslatower", @ent, vecSpawnPos);
@@ -119,7 +125,6 @@ class CWavePoint : IScriptedEntity
 		this.m_tmrSpawnWave.SetDelay(this.m_uiWaveDelay);
 		this.m_tmrSpawnWave.Reset();
 		this.m_tmrSpawnWave.SetActive(true);
-		this.SpawnWave();
 		this.m_oModel.Alloc();
 	}
 	
@@ -131,6 +136,15 @@ class CWavePoint : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("game_started", false) == false) {
+			return;
+		} else {
+			if (!this.m_bInitialWave) {
+				this.m_bInitialWave = true;
+				this.SpawnWave();
+			}
+		}
+
 		if (this.m_tmrSpawnWave.IsActive()) {
 			this.m_tmrSpawnWave.Update();
 			if (this.m_tmrSpawnWave.IsElapsed()) {

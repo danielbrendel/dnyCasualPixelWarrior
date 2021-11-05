@@ -16,7 +16,7 @@
 /* Laser entity */
 class CLaserEntity : IScriptedEntity
 {
-	uint32 LASER_SHOT_DAMAGE = 20;
+	uint32 LASER_SHOT_DAMAGE = 45;
 
 	Vector m_vecPos;
 	Vector m_vecSize;
@@ -126,7 +126,7 @@ class CLaserEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (@ref != @this.m_pOwner) {
+		if ((@ref != @this.m_pOwner) && (ref.GetName() != this.GetName()) && (ref.GetName() != "weapon_gun") && (ref.GetName() != "item_coin") && (ref.GetName() != "item_health")) {
 			this.m_bRemove = true;
 			
 			if ((this.m_pOwner.GetName() != "player") && (ref.GetName() != "player")) {
@@ -134,22 +134,6 @@ class CLaserEntity : IScriptedEntity
 			}
 
 			ref.OnDamage(LASER_SHOT_DAMAGE);
-			
-			if (ref.NeedsRemoval()) {
-				if (@this.m_pOwner == @Ent_GetPlayerEntity()) {
-					IPlayerEntity@ casted = cast<IPlayerEntity>(this.m_pOwner);
-					
-					if (ref.GetName() == "headcrab") {
-						casted.AddPlayerScore(1);
-					} else if (ref.GetName() == "tank") {
-						casted.AddPlayerScore(15);
-					} else if (ref.GetName() == "teslatower") {
-						casted.AddPlayerScore(10);
-					} else {
-						casted.AddPlayerScore(1);
-					}
-				}
-			}
 		}
 	}
 	
