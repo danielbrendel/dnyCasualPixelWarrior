@@ -204,7 +204,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		}
 		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 		this.m_hMuzzle = R_LoadSprite(GetPackagePath() + "gfx\\muzzle_turned.png", 1, 256, 256, 1, false);
-		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\dodge.wav");
+		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\swoosh.wav");
 		this.m_hGameInfoFont = R_LoadFont("Verdana", 21, 45);
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
