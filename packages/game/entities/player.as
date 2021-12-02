@@ -999,5 +999,7 @@ bool SaveGame()
 	
 	writer.EndSaveGame();
 	
+	Print("Done!");
+	
 	return true;
 }

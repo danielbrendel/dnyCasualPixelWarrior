@@ -66,6 +66,7 @@ class CWaveMonitor : IScriptedEntity
 				if (this.AllOpponentsDefeated()) {
 					this.m_tmrMonitor.SetActive(false);
 					Ent_SetGoalActivationStatus(true);
+					TriggerGameSave();
 					HUD_AddMessage(_("app.potal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
 				}
 			}
