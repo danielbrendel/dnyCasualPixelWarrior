@@ -1,1 +1,2 @@
 listbox_select.wav, mainmenu_select.wav, hint.wav: https://opengameart.org/content/ui-sound-effects-library
+menu.wav: tricksntraps (https://opengameart.org/content/free-music-pack)
