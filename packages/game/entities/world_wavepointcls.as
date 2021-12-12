@@ -165,14 +165,13 @@ class CWavePoint : IScriptedEntity
 			if (this.m_tmrSpawnWave.IsElapsed()) {
 				this.m_tmrSpawnWave.Reset();
 				
+				this.SpawnWave();
+
 				this.m_uiCurCount++;
 				if (this.m_uiCurCount >= this.m_uiWaveCount) {
 					this.m_tmrSpawnWave.SetActive(false);
 					this.m_bRemove = true;
-					return;
 				}
-				
-				this.SpawnWave();
 			}
 		}
 	}

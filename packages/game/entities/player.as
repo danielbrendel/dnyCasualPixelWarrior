@@ -142,7 +142,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	int m_iScore;
 	SpriteHandle m_hCrosshair;
 	Vector m_vecCrosshair;
-	Timer m_tmrDoding;
+	Timer m_tmrDodging;
 	Timer m_tmrMayDodge;
 	MovementDir m_dodgeType;
 	uint m_uiDodgeCounter;
@@ -219,10 +219,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrSteps.SetDelay(500);
 		this.m_tmrSteps.Reset();
 		this.m_tmrSteps.SetActive(false);
-		this.m_tmrDoding.SetDelay(10);
-		this.m_tmrDoding.Reset();
-		this.m_tmrDoding.SetActive(false);
-		this.m_tmrMayDodge.SetDelay(2500);
+		this.m_tmrDodging.SetDelay(10);
+		this.m_tmrDodging.Reset();
+		this.m_tmrDodging.SetActive(false);
+		this.m_tmrMayDodge.SetDelay(1650);
 		this.m_tmrMayDodge.Reset();
 		this.m_tmrMayDodge.SetActive(true);
 		this.m_tmrShowFlare.SetDelay(50);
@@ -447,16 +447,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if ((this.m_uiButtons & BTN_DODGE) == BTN_DODGE) {
 			if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
 				if (this.m_tmrMayDodge.IsElapsed()) {
-					this.m_tmrDoding.Reset();
-					this.m_tmrDoding.SetActive(true);
+					this.m_tmrDodging.Reset();
+					this.m_tmrDodging.SetActive(true);
 					this.m_tmrMayDodge.Reset();
 					this.m_dodgeType = MOVE_FORWARD;
 					S_PlaySound(this.m_hDodge, S_GetCurrentVolume());
 				}
 			} else if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
 				if (this.m_tmrMayDodge.IsElapsed()) {
-					this.m_tmrDoding.Reset();
-					this.m_tmrDoding.SetActive(true);
+					this.m_tmrDodging.Reset();
+					this.m_tmrDodging.SetActive(true);
 					this.m_tmrMayDodge.Reset();
 					this.m_dodgeType = MOVE_BACKWARD;
 					S_PlaySound(this.m_hDodge, S_GetCurrentVolume());
@@ -470,13 +470,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_tmrMayDodge.Update();
 		}
 
-		if (this.m_tmrDoding.IsActive()) {
-			this.m_tmrDoding.Update();
-			if (this.m_tmrDoding.IsElapsed()) {
+		if (this.m_tmrDodging.IsActive()) {
+			this.m_tmrDodging.Update();
+			if (this.m_tmrDodging.IsElapsed()) {
 				Ent_Move(this, PLAYER_SPEED * 3, this.m_dodgeType);
 				this.m_uiDodgeCounter++;
 				if (this.m_uiDodgeCounter >= 5) {
-					this.m_tmrDoding.SetActive(false);
+					this.m_tmrDodging.SetActive(false);
 					this.m_uiDodgeCounter = 0;
 				}
 			}
