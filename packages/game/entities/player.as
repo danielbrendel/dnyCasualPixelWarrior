@@ -304,27 +304,29 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		
 		if ((this.m_uiButtons & BTN_MOVELEFT) == BTN_MOVELEFT) {
 			float fSpeed;
-			
-			if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
+
+			/*if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
 				fSpeed = -PLAYER_SPEED;
 			} else {
 				fSpeed = PLAYER_SPEED;
-			}
+			}*/
 			
-			Ent_Move(this, fSpeed, MOVE_LEFT);
+			Ent_Move(this, PLAYER_SPEED, MOVE_LEFT);
+
 			this.m_bMoving = true;
-		} 
+		}
 		
 		if ((this.m_uiButtons & BTN_MOVERIGHT) == BTN_MOVERIGHT) {
 			float fSpeed;
 			
-			if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
+			/*if ((this.m_fRotation > 4.725f) || (this.m_fRotation < 1.575f)) {
 				fSpeed = -PLAYER_SPEED;
 			} else {
 				fSpeed = PLAYER_SPEED;
-			}
+			}*/
 			
-			Ent_Move(this, fSpeed, MOVE_RIGHT);
+			Ent_Move(this, PLAYER_SPEED, MOVE_RIGHT);
+
 			this.m_bMoving = true;
 		}
 
