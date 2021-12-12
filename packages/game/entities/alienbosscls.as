@@ -365,9 +365,9 @@ class CAlienBoss : IScriptedEntity
 			int iHealthBarWidthValue = iHealthBarWidthPercent * iHealtMaxhWidth / 100;
 
 			Color sBarColor = Color(0, 255, 0, 255);
-			if ((this.m_uiHealth < 120) && (this.m_uiHealth >= 55)) {
+			if ((iHealthBarWidthPercent < 65) && (iHealthBarWidthPercent >= 25)) {
 				sBarColor = Color(150, 150, 0, 150);
-			} else if (this.m_uiHealth < 55) {
+			} else if (iHealthBarWidthPercent < 25) {
 				sBarColor = Color(250, 0, 0, 150);
 			}
 
