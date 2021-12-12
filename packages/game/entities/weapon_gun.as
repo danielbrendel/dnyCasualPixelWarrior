@@ -32,7 +32,7 @@ class CGunEntity : IScriptedEntity
 	CGunEntity()
     {
 		this.m_vecSize = Vector(5, 5);
-		this.m_fSpeed = 600.0;
+		this.m_fSpeed = 850.0;
 		this.m_bRemove = false;
 		@this.m_pOwner = null;
 		this.m_bExplode = false;
