@@ -15,7 +15,7 @@
 #include "explosion.as"
 #include "item_coin.as"
 
-const int C_MECH_REACT_RANGE = 500;
+const int C_MECH_REACT_RANGE = 650;
 const int C_MECH_ATTACK_RANGE = 300;
 const float C_MECH_DEFAULT_SPEED = 65.0;
 

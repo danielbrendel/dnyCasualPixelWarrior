@@ -15,8 +15,8 @@
 #include "explosion.as"
 #include "item_coin.as"
 
-const int C_ALIENVEHICLE_REACT_RANGE = 500;
-const int C_ALIENVEHICLE_ATTACK_RANGE = 300;
+const int C_ALIENVEHICLE_REACT_RANGE = 550;
+const int C_ALIENVEHICLE_ATTACK_RANGE = 350;
 const float C_ALIENVEHICLE_DEFAULT_SPEED = 65.0;
 
 /* Alien vehicle entity */

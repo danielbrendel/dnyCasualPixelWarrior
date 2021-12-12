@@ -132,7 +132,7 @@ class CTankEntity : IScriptedEntity
 		}
 		
 		//Process target search
-		const int MAX_CHECK_RANGE = 500;
+		const int MAX_CHECK_RANGE = 550;
 		IScriptedEntity@ player = Ent_GetPlayerEntity();
 		if (Ent_IsValid(@player)) {
 			if ((this.m_vecPos.Distance(player.GetPosition()) < MAX_CHECK_RANGE)) {

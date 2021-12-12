@@ -17,7 +17,7 @@
 #include "item_coin.as"
 
 string g_szPackagePath = "";
-const int C_BALLISTA_REACT_RANGE = 500;
+const int C_BALLISTA_REACT_RANGE = 550;
 const int C_BALLISTA_ATTACK_RANGE = 300;
 const float C_BALLISTA_DEFAULT_SPEED = 75.0;
 

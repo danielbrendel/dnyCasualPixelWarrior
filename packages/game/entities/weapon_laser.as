@@ -126,7 +126,7 @@ class CLaserEntity : IScriptedEntity
 	//Called when the entity collided with another entity
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if ((@ref != @this.m_pOwner) && (ref.GetName() != this.GetName()) && (ref.GetName() != "weapon_gun") && (ref.GetName() != "item_coin") && (ref.GetName() != "item_health")) {
+		if ((@ref != @this.m_pOwner) && (ref.GetName() != this.GetName()) && (ref.GetName() != "weapon_gun") && (ref.GetName() != "weapon_laserball") && (ref.GetName() != "weapon_missile") && (ref.GetName() != "item_coin") && (ref.GetName() != "item_health")) {
 			this.m_bRemove = true;
 			
 			if ((this.m_pOwner.GetName() != "player") && (ref.GetName() != "player")) {

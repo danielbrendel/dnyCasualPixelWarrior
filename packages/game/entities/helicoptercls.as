@@ -14,8 +14,8 @@
 #include "weapon_missile.as"
 #include "item_coin.as"
 
-const int C_HELICOPTER_REACT_RANGE = 500;
-const int C_HELICOPTER_ATTACK_RANGE = 300;
+const int C_HELICOPTER_REACT_RANGE = 550;
+const int C_HELICOPTER_ATTACK_RANGE = 350;
 const float C_HELICOPTER_DEFAULT_SPEED = 75.0;
 
 /* Helicopter entity */

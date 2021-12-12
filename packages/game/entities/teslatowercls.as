@@ -51,7 +51,7 @@ class CTeslaTower : IScriptedEntity
 	{
 		//Check for enemies in close range and act accordingly
 		
-		const int TESLATOWER_ATTACK_RANGE = 320;
+		const int TESLATOWER_ATTACK_RANGE = 550;
 		
 		@this.m_pTarget = null;
 		

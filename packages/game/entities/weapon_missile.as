@@ -13,7 +13,7 @@
 
 #include "explosion.as"
 
-const uint MISSILE_DAMAGE = 50;
+const uint MISSILE_DAMAGE = 35;
 
 /* Missile weapon entity */
 class CMissileEntity : IScriptedEntity

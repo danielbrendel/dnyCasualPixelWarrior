@@ -924,17 +924,17 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	player.SetRotation(fRot);
 	
 	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
-	HUD_UpdateAmmoItem("handgun", 100, 0);
+	HUD_UpdateAmmoItem("handgun", 125, 0);
 	HUD_SetAmmoDisplayItem("handgun");
 	
 	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 15, 100);
+	HUD_UpdateAmmoItem("laser", 25, 100);
 	
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 10, 100);
+	HUD_UpdateAmmoItem("shotgun", 20, 100);
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
-	HUD_UpdateCollectable("grenade", 5);
+	HUD_UpdateCollectable("grenade", 10);
 	
 	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
 	HUD_UpdateCollectable("coins", 0);
