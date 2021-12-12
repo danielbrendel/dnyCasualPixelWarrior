@@ -165,7 +165,7 @@ class CWolfdragon : IScriptedEntity
 	void OnRelease()
 	{
 		CBloodSplash @obj = CBloodSplash();
-		Ent_SpawnEntity("blooddecal", @obj, this.m_vecPos);
+		Ent_SpawnEntity("blooddecal", @obj, Vector(this.m_vecPos[0] + 134, this.m_vecPos[1] + 100));
 		
 		SoundHandle hSplash = S_QuerySound(GetPackagePath() + "sound\\hc_splash.wav");
 		S_PlaySound(hSplash, S_GetCurrentVolume());
