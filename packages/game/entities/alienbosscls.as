@@ -18,9 +18,10 @@
 #include "bigexplosion.as"
 #include "item_coin.as"
 
-const int C_ALIENBOSS_REACT_RANGE = 550;
+const int C_ALIENBOSS_REACT_RANGE = 650;
 const int C_ALIENBOSS_ATTACK_RANGE = 500;
 const float C_ALIENBOSS_DEFAULT_SPEED = 65.0;
+const int C_ALIENBOSS_MAX_HEALTH = 3000;
 
 /* Alien boss entity */
 class CAlienBoss : IScriptedEntity
@@ -242,7 +243,7 @@ class CAlienBoss : IScriptedEntity
 		this.m_vecSize = Vector(288, 321);
 		this.m_bGotEnemy = this.m_bLastGotEnemy = false;
 		this.m_fSpeed = C_ALIENBOSS_DEFAULT_SPEED;
-		this.m_uiHealth = 200;
+		this.m_uiHealth = C_ALIENBOSS_MAX_HEALTH;
 		this.m_uiFlickerCount = 0;
     }
 	
@@ -357,11 +358,11 @@ class CAlienBoss : IScriptedEntity
 
 		R_DrawSprite(this.m_hMove, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
 
-		const int iHealtMaxhWidth = 300;
-		const int iMaxHealth = 200;
+		const int iHealtMaxhWidth = 500;
 
 		if (this.m_uiHealth > 0) {
-			int iHealthBarWidth = int(this.m_uiHealth) * iHealtMaxhWidth / 100;
+			int iHealthBarWidthPercent = int(this.m_uiHealth) * 100 / C_ALIENBOSS_MAX_HEALTH;
+			int iHealthBarWidthValue = iHealthBarWidthPercent * iHealtMaxhWidth / 100;
 
 			Color sBarColor = Color(0, 255, 0, 255);
 			if ((this.m_uiHealth < 120) && (this.m_uiHealth >= 55)) {
@@ -370,7 +371,7 @@ class CAlienBoss : IScriptedEntity
 				sBarColor = Color(250, 0, 0, 150);
 			}
 
-			R_DrawFilledBox(Vector(Wnd_GetWindowCenterX() - iHealtMaxhWidth / 2 - 100, Wnd_GetWindowCenterY() * 2 - 100), Vector(iHealthBarWidth, 50), sBarColor);
+			R_DrawFilledBox(Vector(Wnd_GetWindowCenterX() - iHealtMaxhWidth / 2 - 100, Wnd_GetWindowCenterY() * 2 - 100), Vector(iHealthBarWidthValue, 50), sBarColor);
 			R_DrawString(this.m_hBossFont, _("app.boss", "BOSS"), Vector(Wnd_GetWindowCenterX() - iHealtMaxhWidth / 2 - 100 + 2, Wnd_GetWindowCenterY() * 2 - 100), Color(200, 200, 200, 255));
 		}
 	}

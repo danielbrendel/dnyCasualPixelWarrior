@@ -74,6 +74,20 @@ class CWavePoint : IScriptedEntity
 	{
 		return this.m_uiCurCount >= this.m_uiWaveCount;
 	}
+
+	//Get entity count of entity type
+	int GetEntityTypeCount(const string &in szType)
+	{
+		int count = 0;
+
+		for (size_t i = 0; i < Ent_GetEntityCount(); i++) {
+			if (Ent_GetEntityHandle(i).GetName() == szType) {
+				count++;
+			}
+		}
+
+		return count;
+	}
 	
 	//Spawn current wave
 	void SpawnWave()
@@ -142,6 +156,7 @@ class CWavePoint : IScriptedEntity
 			if (!this.m_bInitialWave) {
 				this.m_bInitialWave = true;
 				this.SpawnWave();
+				this.m_uiCurCount++;
 			}
 		}
 
@@ -154,6 +169,7 @@ class CWavePoint : IScriptedEntity
 				if (this.m_uiCurCount >= this.m_uiWaveCount) {
 					this.m_tmrSpawnWave.SetActive(false);
 					this.m_bRemove = true;
+					return;
 				}
 				
 				this.SpawnWave();
