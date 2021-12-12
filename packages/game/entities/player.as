@@ -153,6 +153,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	uint m_uiGameCounter;
 	Timer m_tmrGoInfo;
 	FontHandle m_hGameInfoFont;
+	bool m_bProcessOnce;
 	
 	CPlayerEntity()
     {
@@ -167,6 +168,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_iScore = 0;
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
+		this.m_bProcessOnce = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
     }
@@ -202,7 +204,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		for (int i = 1; i < 9; i++) {
 			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
 		}
-		this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 		this.m_hMuzzle = R_LoadSprite(GetPackagePath() + "gfx\\muzzle_turned.png", 1, 256, 256, 1, false);
 		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\swoosh.wav");
 		this.m_hGameInfoFont = R_LoadFont("Verdana", 21, 45);
@@ -248,6 +249,17 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		//First call processings
+		if (!this.m_bProcessOnce) {
+			this.m_bProcessOnce = true;
+
+			if (GetCurrentMap() == "snowland.cfg") {
+				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair_red.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
+			} else {
+				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
+			}
+		}
+
 		//Process game counter
 		if (this.m_tmrGameCounter.IsActive()) {
 			this.m_tmrGameCounter.Update();
