@@ -210,7 +210,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrMayDamage.SetDelay(2000);
 		this.m_tmrMayDamage.Reset();
 		this.m_tmrMayDamage.SetActive(true);
-		this.m_tmrAttack.SetDelay(500);
+		this.m_tmrAttack.SetDelay(400);
 		this.m_tmrAttack.Reset();
 		this.m_tmrAttack.SetActive(true);
 		this.m_tmrFlicker.SetDelay(250);
@@ -928,10 +928,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	HUD_SetAmmoDisplayItem("handgun");
 	
 	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 25, 100);
+	HUD_UpdateAmmoItem("laser", 35, 100);
 	
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 20, 100);
+	HUD_UpdateAmmoItem("shotgun", 40, 100);
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
 	HUD_UpdateCollectable("grenade", 10);

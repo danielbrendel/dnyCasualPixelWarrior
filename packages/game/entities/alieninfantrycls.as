@@ -15,7 +15,7 @@
 #include "explosion.as"
 #include "item_coin.as"
 
-const int C_ALIENINFANTRY_REACT_RANGE = 550;
+const int C_ALIENINFANTRY_REACT_RANGE = 450;
 const int C_ALIENINFANTRY_ATTACK_RANGE = 350;
 const float C_ALIENINFANTRY_DEFAULT_SPEED = 65.0;
 

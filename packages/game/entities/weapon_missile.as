@@ -34,7 +34,7 @@ class CMissileEntity : IScriptedEntity
     {
 		this.m_bRemove = false;
 		this.m_vecSize = Vector(32, 32);
-		this.m_fSpeed = 300;
+		this.m_fSpeed = 200;
 		this.m_iTrailIndex = 0;
     }
 	
