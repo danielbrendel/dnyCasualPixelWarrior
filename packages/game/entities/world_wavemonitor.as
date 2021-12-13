@@ -38,6 +38,28 @@ class CWaveMonitor : IScriptedEntity
 			&& Ent_GetEntityNameCount("mech") == 0
 			&& Ent_GetEntityNameCount("alienboss") == 0;
 	}
+
+	//Handle Steam Achievements
+	void HandleAchievements()
+	{
+		if (GetCurrentMap() == "greenland.cfg") {
+			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FINISH_GREENLAND")) {
+				Steam_SetAchievement("ACHIEVEMENT_FINISH_GREENLAND");
+			}
+		} else if (GetCurrentMap() == "snowland.cfg") {
+			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FINISH_SNOWLAND")) {
+				Steam_SetAchievement("ACHIEVEMENT_FINISH_SNOWLAND");
+			}
+		} else if (GetCurrentMap() == "wasteland.cfg") {
+			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FINISH_WASTELAND")) {
+				Steam_SetAchievement("ACHIEVEMENT_FINISH_WASTELAND");
+			}
+		} else if (GetCurrentMap() == "bossfight.cfg") {
+			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_DEFEAT_BOSS")) {
+				Steam_SetAchievement("ACHIEVEMENT_DEFEAT_BOSS");
+			}
+		}
+	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
@@ -66,6 +88,7 @@ class CWaveMonitor : IScriptedEntity
 				if (this.AllOpponentsDefeated()) {
 					this.m_tmrMonitor.SetActive(false);
 					Ent_SetGoalActivationStatus(true);
+					this.HandleAchievements();
 					//TriggerGameSave();
 					HUD_AddMessage(_("app.potal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
 				}

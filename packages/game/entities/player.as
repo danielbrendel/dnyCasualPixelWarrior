@@ -253,6 +253,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if (!this.m_bProcessOnce) {
 			this.m_bProcessOnce = true;
 
+			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FIRST_START")) {
+				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
+			}
+
 			if (GetCurrentMap() == "snowland.cfg") {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair_red.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			} else {
