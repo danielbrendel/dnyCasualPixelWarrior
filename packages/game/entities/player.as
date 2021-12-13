@@ -618,8 +618,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		
 		R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 
-		R_DrawString(R_GetDefaultFont(), formatInt(this.m_vecPos[0]) + "x" + formatInt(this.m_vecPos[1]), Vector(300, 20), Color(255,0,0,255));
-
 		if ((this.m_tmrShowFlare.IsActive()) && (!this.m_tmrShowFlare.IsElapsed())) {
 			Vector vecForward = Vector(Wnd_GetWindowCenterX() - 128, Wnd_GetWindowCenterY() - 128);
 			vecForward[0] += int(sin(this.GetRotation()) * 92);
