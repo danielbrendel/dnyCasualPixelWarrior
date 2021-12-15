@@ -175,7 +175,7 @@ class CItemHealth : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "blooddecal";
+		return "item_health";
 	}
 	
 	//This vector is used for drawing the selection box

@@ -171,7 +171,7 @@ class CWorldObstacle : IScriptedEntity
 	//Return a name string here, e.g. the class name or instance name.
 	string GetName()
 	{
-		return "blooddecal";
+		return "world_obstacle";
 	}
 	
 	//This vector is used for drawing the selection box
