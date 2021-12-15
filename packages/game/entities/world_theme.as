@@ -11,6 +11,8 @@
 	Released under the MIT license
 */
 
+const int C_MUSIC_VOLUME_PERCENT = 90;
+
 /* World theme entity */
 class CWorldTheme : IScriptedEntity
 {
@@ -51,7 +53,10 @@ class CWorldTheme : IScriptedEntity
 	{
 		if (!this.m_bProcessOnce) {
 			this.m_bProcessOnce = true;
-			S_PlaySound(this.m_hTheme, S_GetCurrentVolume(), true);
+			
+			int sndPercent = C_MUSIC_VOLUME_PERCENT * S_GetCurrentVolume() / 100;
+			
+			S_PlaySound(this.m_hTheme, sndPercent, true);
 		}
 	}
 	
