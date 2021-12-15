@@ -16,6 +16,7 @@ class CCoinItem : IScriptedEntity
 {
 	Vector m_vecPos;
 	Vector m_vecSize;
+	float m_fRotation;
 	Model m_oModel;
 	Timer m_tmrSpriteChange;
 	SpriteHandle m_hSprite;
@@ -31,6 +32,28 @@ class CCoinItem : IScriptedEntity
 		this.m_bRandomPos = value;
 	}
 
+	bool IsPlayerNear()
+	{
+		//Check if player is close enough
+
+		const int PLAYER_MOVEMENT_DISTANCE = 200;
+
+		IScriptedEntity@ pPlayer = Ent_GetPlayerEntity();
+		if (@pPlayer != null) {
+			return this.m_vecPos.Distance(pPlayer.GetPosition()) < PLAYER_MOVEMENT_DISTANCE;
+		}
+
+		return false;
+	}
+
+	void LookAt(const Vector &in vPos)
+	{
+		//Look at position
+
+		float flAngle = atan2(float(vPos[1] - this.m_vecPos[1]), float(vPos[0] - this.m_vecPos[0]));
+		this.m_fRotation = flAngle + 6.30 / 4;
+	}
+
 	CCoinItem()
     {
 		this.m_vecSize = Vector(40, 43);
@@ -43,6 +66,7 @@ class CCoinItem : IScriptedEntity
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
+		this.m_fRotation = 0.0;
 		if (this.m_bRandomPos) {
 			this.m_vecPos[0] += Util_Random(0, 100) - 50;
 			this.m_vecPos[1] += Util_Random(0, 100) - 50;
@@ -75,6 +99,12 @@ class CCoinItem : IScriptedEntity
 			if (this.m_iSpriteIndex >= 4) {
 				this.m_iSpriteIndex = 0;
 			}
+		}
+
+		if (this.IsPlayerNear()) {
+			this.LookAt(Ent_GetPlayerEntity().GetPosition());
+
+			Ent_Move(this, 150, MOVE_FORWARD);
 		}
 	}
 	
@@ -153,12 +183,13 @@ class CCoinItem : IScriptedEntity
 	//Return the rotation.
 	float GetRotation()
 	{
-		return 0.0;
+		return this.m_fRotation;
 	}
 	
 	//Set rotation
 	void SetRotation(float fRot)
 	{
+		this.m_fRotation = fRot;
 	}
 	
 	//Return a name string here, e.g. the class name or instance name.
