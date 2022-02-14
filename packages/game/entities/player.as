@@ -297,12 +297,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		//Handle button flags
 
 		if ((this.m_uiButtons & BTN_FORWARD) == BTN_FORWARD) {
-			Ent_Move(this, PLAYER_SPEED, MOVE_FORWARD);
+			Ent_Move(this, PLAYER_SPEED, MOVE_NORTH);
 			this.m_bMoving = true;
 		} 
 		
 		if ((this.m_uiButtons & BTN_BACKWARD) == BTN_BACKWARD) {
-			Ent_Move(this, PLAYER_SPEED, MOVE_BACKWARD);
+			Ent_Move(this, PLAYER_SPEED, MOVE_SOUTH);
 			this.m_bMoving = true;
 		} 
 		
@@ -315,7 +315,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				fSpeed = PLAYER_SPEED;
 			}*/
 			
-			Ent_Move(this, PLAYER_SPEED, MOVE_LEFT);
+			Ent_Move(this, PLAYER_SPEED, MOVE_WEST);
 
 			this.m_bMoving = true;
 		}
@@ -329,7 +329,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				fSpeed = PLAYER_SPEED;
 			}*/
 			
-			Ent_Move(this, PLAYER_SPEED, MOVE_RIGHT);
+			Ent_Move(this, PLAYER_SPEED, MOVE_EAST);
 
 			this.m_bMoving = true;
 		}
