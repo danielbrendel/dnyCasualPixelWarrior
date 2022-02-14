@@ -117,6 +117,12 @@ class CLaserEntity : IScriptedEntity
 		return this.m_bRemove; //Remove laser when reached position
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate whether this entity is collidable
 	bool IsCollidable()
 	{

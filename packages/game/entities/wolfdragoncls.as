@@ -263,6 +263,12 @@ class CWolfdragon : IScriptedEntity
 		return this.m_uiHealth == 0;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate whether this entity is collidable
 	bool IsCollidable()
 	{

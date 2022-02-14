@@ -193,6 +193,12 @@ class CWavePoint : IScriptedEntity
 		return this.m_bRemove;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate if entity can be collided
 	bool IsCollidable()
 	{

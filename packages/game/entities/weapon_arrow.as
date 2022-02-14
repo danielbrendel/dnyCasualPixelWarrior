@@ -106,6 +106,12 @@ class CArrowEntity : IScriptedEntity
 		return true;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Called when the entity recieves damage
 	void OnDamage(uint32 damageValue)
 	{

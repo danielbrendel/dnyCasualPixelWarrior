@@ -137,6 +137,12 @@ class CItemAmmoBase : IScriptedEntity
 		return false;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate if entity can be collided
 	bool IsCollidable()
 	{

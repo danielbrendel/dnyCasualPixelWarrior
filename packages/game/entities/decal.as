@@ -70,6 +70,12 @@ class CDecalEntity : IScriptedEntity
 		return this.m_oLifeTime.IsElapsed();
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate if entity can be collided
 	bool IsCollidable()
 	{

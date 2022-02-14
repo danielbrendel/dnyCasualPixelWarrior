@@ -106,6 +106,12 @@ class CExplosionEntity : IScriptedEntity
 		return this.m_iFrameCount >= 6;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate if entity can be collided
 	bool IsCollidable()
 	{

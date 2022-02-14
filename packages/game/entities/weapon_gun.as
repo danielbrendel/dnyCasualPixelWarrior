@@ -103,6 +103,12 @@ class CGunEntity : IScriptedEntity
 		return this.m_bRemove;
 	}
 	
+	//Indicate if entity can be dormant
+	bool CanBeDormant()
+	{
+		return false;
+	}
+	
 	//Indicate whether this entity is collidable
 	bool IsCollidable()
 	{
