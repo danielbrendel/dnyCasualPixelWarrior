@@ -953,7 +953,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 //Restore game state
 void RestoreState(const string &in szIdent, const string &in szValue)
 {
-	string id = Props_ExtractValue(szValue, "id");
+	Ent_SetGoalActivationStatus(true);
+	IScriptedEntity@ ent = Ent_GetPlayerEntity();
+	ent.SetPosition(Vector(950, 700));
+	/*string id = Props_ExtractValue(szValue, "id");
 	if (id != "") {
 		IScriptedEntity@ ent = Ent_GetEntityHandle(parseInt(id));
 		if (@ent != null) {
@@ -999,7 +1002,7 @@ void RestoreState(const string &in szIdent, const string &in szValue)
 		} else {
 			Print("Unknown spawnable entity ident: " + szIdent);
 		}
-	}
+	}*/
 }
 
 //Save game state to disk
@@ -1018,7 +1021,7 @@ bool SaveGame()
 			writer.WriteAttribute(ent.GetName(), ent.GetSaveGameProperties());
 		}
 	}
-	
+
 	writer.EndSaveGame();
 	
 	Print("Done!");

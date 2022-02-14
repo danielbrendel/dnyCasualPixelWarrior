@@ -90,8 +90,7 @@ class CWaveMonitor : IScriptedEntity
 					this.m_tmrMonitor.SetActive(false);
 					Ent_SetGoalActivationStatus(true);
 					this.HandleAchievements();
-					//TriggerGameSave();
-					HUD_AddMessage(_("app.potal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
+					HUD_AddMessage(_("app.portal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
 				}
 			}
 		}
