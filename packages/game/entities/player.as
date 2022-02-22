@@ -18,6 +18,7 @@ string g_szPackagePath = "";
 #include "weapon_grenade.as"
 #include "explosion.as"
 #include "tankcls.as"
+#include "infomenu.as"
 
 /* Player animation manager */
 class CPlayerAnimation {
@@ -154,6 +155,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	Timer m_tmrGoInfo;
 	FontHandle m_hGameInfoFont;
 	bool m_bProcessOnce;
+	CInfoMenu m_oInfoMenu;
 	
 	CPlayerEntity()
     {
@@ -171,7 +173,79 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_bProcessOnce = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
+
+		this.m_oInfoMenu = CInfoMenu();
     }
+
+	//Load greenland dialog
+	void LoadGreenlandDialog()
+	{
+		array<string> dialog1;
+		dialog1.insertLast("Okay, so the portal has actually worked!");
+		dialog1.insertLast("");
+		dialog1.insertLast("After they destroyed our beloved planed,");
+		dialog1.insertLast("we finally managed to go through the portal to our enemies planet");
+		dialog1.insertLast("");
+		dialog1.insertLast("We need to find their leader who controls their mission");
+		dialog1.insertLast("in order to defeat them to save the survivors of their attack.");
+		dialog1.insertLast("");
+
+		array<string> dialog2;
+		dialog2.insertLast("But before we get to the enemies boss, we surely");
+		dialog2.insertLast("have to make our way through their minions.");
+		dialog2.insertLast("");
+		dialog2.insertLast("I sense that the enemy has previously captured a lot of planets,");
+		dialog2.insertLast("so we will face many of their slaves who now fight for the enemy boss.");
+		dialog2.insertLast("");
+
+		array<string> dialog3;
+		dialog3.insertLast("In order to proceed to the next chapter, make sure");
+		dialog3.insertLast("you defeat all of their waves spawned against you.");
+		dialog3.insertLast("");
+		dialog3.insertLast("After finishing each enemy wave, a portal will show up");
+		dialog3.insertLast("where you can escape to the next chapter.");
+		dialog3.insertLast("");
+
+		array<string> dialog4;
+		dialog4.insertLast("You are equipped with three different weapons");
+		dialog4.insertLast("plus you also got some grenades.");
+		dialog4.insertLast("");
+		dialog4.insertLast("Pay attention to the various items on each level");
+		dialog4.insertLast("which supply you with more ammunition or health.");
+		dialog4.insertLast("");
+
+		array<string> dialog5;
+		dialog5.insertLast("Now it is up to you!");
+		dialog5.insertLast("");
+		dialog5.insertLast("");
+		dialog5.insertLast("Good luck, soldier!");
+		dialog5.insertLast("");
+		dialog5.insertLast("");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
+		this.m_oInfoMenu.AddDialog(dialog4);
+		this.m_oInfoMenu.AddDialog(dialog5);
+	}
+
+	//Load snowland dialog
+	void LoadSnowlandDialog()
+	{
+		
+	}
+
+	//Load wasteland dialog
+	void LoadWastelandDialog()
+	{
+		
+	}
+
+	//Load bossfight dialog
+	void LoadBossfightDialog()
+	{
+		
+	}
 	
 	//Aim at screen view position
 	void AimAtScreenPoint(const Vector &in vecPos)
@@ -257,6 +331,19 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
 			}
 
+			if (GetCurrentMap() == "greenland.cfg") {
+				this.LoadGreenlandDialog();
+			} else if (GetCurrentMap() == "snowland.cfg") {
+				this.LoadSnowlandDialog();
+			} else if (GetCurrentMap() == "wasteland.cfg") {
+				this.LoadWastelandDialog();
+			} else if (GetCurrentMap() == "bossfight.cfg") {
+				this.LoadBossfightDialog();
+			}
+
+			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+			this.m_oInfoMenu.Start();
+
 			if (GetCurrentMap() == "snowland.cfg") {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair_red.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			} else {
@@ -265,17 +352,21 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		}
 
 		//Process game counter
-		if (this.m_tmrGameCounter.IsActive()) {
-			this.m_tmrGameCounter.Update();
-			if (this.m_tmrGameCounter.IsElapsed()) {
-				this.m_uiGameCounter++;
-				if (this.m_uiGameCounter >= GAME_COUNTER_MAX) {
-					this.m_tmrGameCounter.SetActive(false);
-					this.m_tmrGoInfo.Reset();
-					this.m_tmrGoInfo.SetActive(true);
+		if (!this.m_oInfoMenu.IsActive()) {
+			if (this.m_tmrGameCounter.IsActive()) {
+				this.m_tmrGameCounter.Update();
+				if (this.m_tmrGameCounter.IsElapsed()) {
+					this.m_uiGameCounter++;
+					if (this.m_uiGameCounter >= GAME_COUNTER_MAX) {
+						this.m_tmrGameCounter.SetActive(false);
+						this.m_tmrGoInfo.Reset();
+						this.m_tmrGoInfo.SetActive(true);
+					}
 				}
 			}
 		}
+
+		this.m_oInfoMenu.Process();
 
 		if (this.m_uiGameCounter < GAME_COUNTER_MAX) {
 			return;
@@ -654,6 +745,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		} else if (this.m_tmrGoInfo.IsActive()) {
 			R_DrawString(this.m_hGameInfoFont, _("app.go", "GO!"), Vector(Wnd_GetWindowCenterX() - 30, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
 		}
+
+		this.m_oInfoMenu.Draw();
 	}
 	
 	//Indicate whether this entity shall be removed by the game
@@ -868,6 +961,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for mouse presses
 	void OnMousePress(int key, bool bDown)
 	{
+		if (this.m_oInfoMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oInfoMenu.OnMouseClick();
+			}
+		}
+
 		if (this.m_tmrGameCounter.IsActive()) {
 			return;
 		}
@@ -893,6 +992,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		
 		//Aim at cursor position
 		this.AimAtScreenPoint(this.m_vecCursorPos);
+
+		//Inform info menu
+		this.m_oInfoMenu.OnUpdateCursorPos(pos);
 	}
 	
 	//Return save game properties
