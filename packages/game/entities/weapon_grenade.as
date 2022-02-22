@@ -14,7 +14,7 @@
 #include "explosion.as"
 
 /* Grenade entity */
-const uint C_GRENADE_DAMAGE = 64;
+const uint C_GRENADE_DAMAGE = 8;
 class CGrenadeEntity : IScriptedEntity
 {
 	Vector m_vecPos;

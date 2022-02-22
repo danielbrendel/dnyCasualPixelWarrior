@@ -419,6 +419,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.LoadWastelandDialog();
 			} else if (GetCurrentMap() == "bossfight.cfg") {
 				this.LoadBossfightDialog();
+				HUD_UpdateCollectable("grenade", 3);
 			}
 
 			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
