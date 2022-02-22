@@ -21,12 +21,20 @@ class CInfoMenu {
     Vector m_vecSize;
     Vector m_vecCursorPos;
     Timer m_tmrUpdateAlpha;
+    SpriteHandle m_hVad;
+    size_t m_uiVadIndex;
+    Timer m_tmrVadAnim;
 
     CInfoMenu()
     {
         this.m_tmrUpdateAlpha.SetDelay(10);
         this.m_vecSize = Vector(500, 380);
         this.m_bActive = false;
+        this.m_hVad = R_LoadSprite(GetPackagePath() + "gfx\\vad.png", 4, 29, 35, 4, false);
+        this.m_uiVadIndex = 0;
+        this.m_tmrVadAnim.SetDelay(250);
+        this.m_tmrVadAnim.Reset();
+        this.m_tmrVadAnim.SetActive(true);
     }
 
     //Add dialog to menu
@@ -90,6 +98,19 @@ class CInfoMenu {
                 }
             }
         }
+
+        //Process VAD animation
+        if (this.m_tmrVadAnim.IsActive()) {
+            this.m_tmrVadAnim.Update();
+            if (this.m_tmrVadAnim.IsElapsed()) {
+                this.m_tmrVadAnim.Reset();
+
+                this.m_uiVadIndex++;
+                if (this.m_uiVadIndex >= 4) {
+                    this.m_uiVadIndex = 0;
+                }
+            }
+        }
     }
 
     //Draw the menu
@@ -101,6 +122,8 @@ class CInfoMenu {
 
         R_DrawBox(this.m_vecPos, this.m_vecSize, 2, Color(0, 0, 0, 255));
         R_DrawFilledBox(Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), Vector(this.m_vecSize[0] - 2, this.m_vecSize[1] - 2), Color(150, 150, 150, 255));
+
+        R_DrawSprite(this.m_hVad, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + 30), this.m_uiVadIndex, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 
         for (size_t i = 0; i < this.m_arrDialogs[this.m_uiCurrentIndex].length(); i++) {
             R_DrawString(R_GetDefaultFont(), this.m_arrDialogs[this.m_uiCurrentIndex][i], Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 10 + i * 39), Color(50, 50, 50, this.m_uiAlphaValue));
