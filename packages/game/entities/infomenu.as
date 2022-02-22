@@ -64,6 +64,13 @@ class CInfoMenu {
         this.m_tmrUpdateAlpha.SetActive(true);
     }
 
+    //Skip dialog
+    void Skip()
+    {
+        this.m_uiCurrentIndex = this.m_arrDialogs.length();
+        this.m_bActive = false;
+    }
+
     //Process menu
     void Process()
     {
@@ -107,19 +114,37 @@ class CInfoMenu {
         }
 
         Color sColor;
-        if (this.MouseInsideButtonText()) {
+        if (this.MouseInsideNextText()) {
             sColor = Color(35, 140, 35, 255);
         } else {
             sColor = Color(30, 120, 30, 255);
         }
 
-        R_DrawString(R_GetDefaultFont(), szCurrent, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 50), sColor);
+        R_DrawString(R_GetDefaultFont(), szCurrent, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
+
+        if (this.MouseInsideSkipText()) {
+            sColor = Color(35, 140, 35, 255);
+        } else {
+            sColor = Color(30, 120, 30, 255);
+        }
+
+        R_DrawString(R_GetDefaultFont(), _("app.infomenu.skip", "Skip"), Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
     }
 
-    //Indicate if mouse cursor is inside button text
-    bool MouseInsideButtonText()
+    //Indicate if mouse cursor is inside next-button text
+    bool MouseInsideNextText()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 50) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 50 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 25) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 25 + 25)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Indicate if mouse cursor is inside skip-button text
+    bool MouseInsideSkipText()
+    {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + this.m_vecSize[0] - 80) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 35) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + this.m_vecSize[0] - 80 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 35 + 25)) {
             return true;
         }
 
@@ -135,8 +160,10 @@ class CInfoMenu {
     //Handle mouse clicks
     void OnMouseClick()
     {
-        if (this.MouseInsideButtonText()) {
+        if (this.MouseInsideNextText()) {
             this.Next();
+        } else if (this.MouseInsideSkipText()) {
+            this.Skip();
         }
     }
 

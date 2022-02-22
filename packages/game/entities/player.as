@@ -156,6 +156,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	FontHandle m_hGameInfoFont;
 	bool m_bProcessOnce;
 	CInfoMenu m_oInfoMenu;
+	SpriteHandle m_hCursor;
 	
 	CPlayerEntity()
     {
@@ -183,7 +184,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		array<string> dialog1;
 		dialog1.insertLast("Okay, so the portal has actually worked!");
 		dialog1.insertLast("");
-		dialog1.insertLast("After they destroyed our beloved planed,");
+		dialog1.insertLast("After they destroyed our beloved planet,");
 		dialog1.insertLast("we finally managed to go through the portal to our enemies planet");
 		dialog1.insertLast("");
 		dialog1.insertLast("We need to find their leader who controls their mission");
@@ -215,10 +216,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog4.insertLast("");
 
 		array<string> dialog5;
+		dialog5.insertLast("");
+		dialog5.insertLast("");
+		dialog5.insertLast("");
+		dialog5.insertLast("");
 		dialog5.insertLast("Now it is up to you!");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
 		dialog5.insertLast("Good luck, soldier!");
+		dialog5.insertLast("");
 		dialog5.insertLast("");
 		dialog5.insertLast("");
 
@@ -232,19 +236,94 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Load snowland dialog
 	void LoadSnowlandDialog()
 	{
-		
+		array<string> dialog1;
+		dialog1.insertLast("This time we have to deal with some monsters who now");
+		dialog1.insertLast("work for the enemy.");
+		dialog1.insertLast("");
+		dialog1.insertLast("It's fascinating what diverse species are out there in the universe.");
+		dialog1.insertLast("Tho fascinating and definitely beautiful, these monsters will not");
+		dialog1.insertLast("hesitate to show you their power. So keep a distance while fighting");
+		dialog1.insertLast("against them.");
+		dialog1.insertLast("");
+
+		array<string> dialog2;
+		dialog2.insertLast("You can use dodging to evade the monsters attacks,");
+		dialog2.insertLast("but beware that some of them have direct impact when attacking.");
+		dialog2.insertLast("");
+		dialog2.insertLast("So, keep an eye open for health items, which you may need when");
+		dialog2.insertLast("dealing with them.");
+		dialog2.insertLast("");
+
+		array<string> dialog3;
+		dialog3.insertLast("I'll get back to you, when we have reached the next level.");
+		dialog3.insertLast("but beware that some of them have direct impact when attacking.");
+		dialog3.insertLast("");
+		dialog3.insertLast("Good luck, soldier!");
+		dialog3.insertLast("");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
 	}
 
 	//Load wasteland dialog
 	void LoadWastelandDialog()
 	{
-		
+		array<string> dialog1;
+		dialog1.insertLast("We are so close to the enemy boss!");
+		dialog1.insertLast("");
+		dialog1.insertLast("We just have to defeat its private army before we can reach it.");
+		dialog1.insertLast("These are not slaves from other planets. These are specifically bred");
+		dialog1.insertLast("for only one reason: Defeat all intruders who want to come too close to");
+		dialog1.insertLast("the boss!");
+		dialog1.insertLast("");
+
+		array<string> dialog2;
+		dialog2.insertLast("So, ready your weaponry and show them what we can do.");
+		dialog2.insertLast("");
+		dialog2.insertLast("I am certain you will manage to defeat them, so we can travel");
+		dialog2.insertLast("to the enemy boss via the next portal.");
+		dialog2.insertLast("");
+		dialog2.insertLast("I count on you... Good luck, soldier!");
+		dialog2.insertLast("");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
 	}
 
 	//Load bossfight dialog
 	void LoadBossfightDialog()
 	{
-		
+		array<string> dialog1;
+		dialog1.insertLast("Finally... after all this time...");
+		dialog1.insertLast("");
+		dialog1.insertLast("WE HAVE REACHED THE BOSS!");
+		dialog1.insertLast("");
+		dialog1.insertLast("The one who is responsible for all that evil who struck our planet.");
+		dialog1.insertLast("It's time to show the boss its place. This was the last time it");
+		dialog1.insertLast("tried to enlarge its reign of tyranny.");
+		dialog1.insertLast("");
+
+		array<string> dialog2;
+		dialog2.insertLast("However the boss will surely not give up defenseless.");
+		dialog2.insertLast("");
+		dialog2.insertLast("I can sense that it is armed with heavy weaponry.");
+		dialog2.insertLast("");
+		dialog2.insertLast("Please keep your distance, use your dodging and also stay away");
+		dialog2.insertLast("from its direct impact weapons.");
+		dialog2.insertLast("");
+
+		array<string> dialog3;
+		dialog3.insertLast("I know you can defeat it. ");
+		dialog3.insertLast("");
+		dialog3.insertLast("");
+		dialog3.insertLast("");
+		dialog3.insertLast("Good luck, soldier!");
+		dialog3.insertLast("");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
 	}
 	
 	//Aim at screen view position
@@ -279,6 +358,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_arrSteps.insertLast(S_QuerySound(GetPackagePath() + "sound\\steps\\stepdirt_" + formatInt(i) + ".wav"));
 		}
 		this.m_hMuzzle = R_LoadSprite(GetPackagePath() + "gfx\\muzzle_turned.png", 1, 256, 256, 1, false);
+		this.m_hCursor = R_LoadSprite(GetPackagePath() + "gfx\\menucursor.png", 1, 16, 16, 1, false);
 		this.m_hDodge = S_QuerySound(GetPackagePath() + "sound\\swoosh.wav");
 		this.m_hGameInfoFont = R_LoadFont("Verdana", 21, 45);
 		this.m_tmrMayDamage.SetDelay(2000);
@@ -727,8 +807,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 		
-		R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
-
 		if ((this.m_tmrShowFlare.IsActive()) && (!this.m_tmrShowFlare.IsElapsed())) {
 			Vector vecForward = Vector(Wnd_GetWindowCenterX() - 128, Wnd_GetWindowCenterY() - 128);
 			vecForward[0] += int(sin(this.GetRotation()) * 92);
@@ -747,6 +825,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		}
 
 		this.m_oInfoMenu.Draw();
+
+		if (this.m_oInfoMenu.IsActive()) {
+			R_DrawSprite(this.m_hCursor, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		} else {
+			R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game
