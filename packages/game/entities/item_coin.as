@@ -163,6 +163,11 @@ class CCoinItem : IScriptedEntity
 			HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") + 1);
 			
 			S_PlaySound(this.m_hCollect, S_GetCurrentVolume());
+
+			if (HUD_GetCollectableCount("coins") % 20 == 0) {
+				ICollectingEntity@ collectingEntity = cast<ICollectingEntity>(ref);
+				collectingEntity.AddHealth(25);
+			}
 			
 			this.m_bRemove = true;
 		}
