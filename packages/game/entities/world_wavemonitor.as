@@ -64,7 +64,7 @@ class CWaveMonitor : IScriptedEntity
 	}
 
 	//Handle coin achievements
-	void HandleCoinAchievements()
+	bool HandleCoinAchievements()
 	{
 		if (Ent_GetEntityNameCount("item_coin") == 0) {
 			if (GetCurrentMap() == "greenland.cfg") {
@@ -84,7 +84,11 @@ class CWaveMonitor : IScriptedEntity
 					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_BOSSFIGHT");
 				}
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
@@ -95,6 +99,9 @@ class CWaveMonitor : IScriptedEntity
 		this.m_tmrMonitor.SetDelay(10000);
 		this.m_tmrMonitor.Reset();
 		this.m_tmrMonitor.SetActive(true);
+		this.m_tmrCoinWatch.SetDelay(2000);
+		this.m_tmrCoinWatch.Reset();
+		this.m_tmrCoinWatch.SetActive(false);
 		this.m_oModel.Alloc();
 	}
 	
@@ -116,7 +123,6 @@ class CWaveMonitor : IScriptedEntity
 					Ent_SetGoalActivationStatus(true);
 					this.HandleGoalAchievements();
 					TriggerGameSave();
-					this.m_tmrCoinWatch.SetDelay(2000);
 					this.m_tmrCoinWatch.Reset();
 					this.m_tmrCoinWatch.SetActive(true);
 					HUD_AddMessage(_("app.portal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
@@ -129,7 +135,9 @@ class CWaveMonitor : IScriptedEntity
 			if (this.m_tmrCoinWatch.IsElapsed()) {
 				this.m_tmrCoinWatch.Reset();
 
-				this.HandleCoinAchievements();
+				if (this.HandleCoinAchievements()) {
+					this.m_tmrCoinWatch.SetActive(false);
+				}
 			}
 		}
 	}

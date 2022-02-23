@@ -173,7 +173,7 @@ class CWolfdragon : IScriptedEntity
 		for (int i = 0; i < 3; i++) {
 			CCoinItem@ coin = CCoinItem();
 			coin.SetRandomPos(true);
-			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
+			Ent_SpawnEntity("item_coin", @coin, Vector(this.m_vecPos[0] + 120, this.m_vecPos[1] + 65));
 		}
 	}
 	
