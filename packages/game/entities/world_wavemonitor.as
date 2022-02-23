@@ -18,6 +18,7 @@ class CWaveMonitor : IScriptedEntity
 	Vector m_vecSize;
 	Model m_oModel;
 	Timer m_tmrMonitor;
+	Timer m_tmrCoinWatch;
 	
 	CWaveMonitor()
     {
@@ -40,8 +41,8 @@ class CWaveMonitor : IScriptedEntity
 			&& Ent_GetEntityNameCount("world_wavepoint") == 0;
 	}
 
-	//Handle Steam Achievements
-	void HandleAchievements()
+	//Handle goal achievements
+	void HandleGoalAchievements()
 	{
 		if (GetCurrentMap() == "greenland.cfg") {
 			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FINISH_GREENLAND")) {
@@ -58,6 +59,30 @@ class CWaveMonitor : IScriptedEntity
 		} else if (GetCurrentMap() == "bossfight.cfg") {
 			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_DEFEAT_BOSS")) {
 				Steam_SetAchievement("ACHIEVEMENT_DEFEAT_BOSS");
+			}
+		}
+	}
+
+	//Handle coin achievements
+	void HandleCoinAchievements()
+	{
+		if (Ent_GetEntityNameCount("item_coin") == 0) {
+			if (GetCurrentMap() == "greenland.cfg") {
+				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_GREENLAND")) {
+					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_GREENLAND");
+				}
+			} else if (GetCurrentMap() == "snowland.cfg") {
+				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_SNOWLAND")) {
+					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_SNOWLAND");
+				}
+			} else if (GetCurrentMap() == "wasteland.cfg") {
+				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_WASTELAND")) {
+					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_WASTELAND");
+				}
+			} else if (GetCurrentMap() == "bossfight.cfg") {
+				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_BOSSFIGHT")) {
+					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_BOSSFIGHT");
+				}
 			}
 		}
 	}
@@ -89,10 +114,22 @@ class CWaveMonitor : IScriptedEntity
 				if (this.AllOpponentsDefeated()) {
 					this.m_tmrMonitor.SetActive(false);
 					Ent_SetGoalActivationStatus(true);
-					this.HandleAchievements();
+					this.HandleGoalAchievements();
 					TriggerGameSave();
+					this.m_tmrCoinWatch.SetDelay(2000);
+					this.m_tmrCoinWatch.Reset();
+					this.m_tmrCoinWatch.SetActive(true);
 					HUD_AddMessage(_("app.portal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
 				}
+			}
+		}
+
+		if (this.m_tmrCoinWatch.IsActive()) {
+			this.m_tmrCoinWatch.Update();
+			if (this.m_tmrCoinWatch.IsElapsed()) {
+				this.m_tmrCoinWatch.Reset();
+
+				this.HandleCoinAchievements();
 			}
 		}
 	}
