@@ -126,6 +126,10 @@ class CWaveMonitor : IScriptedEntity
 					this.m_tmrCoinWatch.Reset();
 					this.m_tmrCoinWatch.SetActive(true);
 					HUD_AddMessage(_("app.portal_now_open", "Portal is now open!"), HUD_MSG_COLOR_GREEN);
+
+					if (GetCurrentMap() == "bossfight.cfg") {
+						CVar_SetBool("game_completed", true);
+					}
 				}
 			}
 		}

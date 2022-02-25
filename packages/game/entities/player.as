@@ -157,6 +157,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	bool m_bProcessOnce;
 	CInfoMenu m_oInfoMenu;
 	SpriteHandle m_hCursor;
+	bool m_bBossDefeatedDlgOpen;
 	
 	CPlayerEntity()
     {
@@ -172,8 +173,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
 		this.m_bProcessOnce = false;
+		this.m_bBossDefeatedDlgOpen = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
+		CVar_Register("game_completed", CVAR_TYPE_BOOL, "0");
 
 		this.m_oInfoMenu = CInfoMenu();
     }
@@ -189,7 +192,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("");
 		dialog1.insertLast("We need to find their leader who controls their mission");
 		dialog1.insertLast("in order to defeat them to save the survivors of their attack.");
-		dialog1.insertLast("");
 
 		array<string> dialog2;
 		dialog2.insertLast("But before we get to the enemies boss, we surely");
@@ -197,7 +199,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog2.insertLast("");
 		dialog2.insertLast("I sense that the enemy has previously captured a lot of planets,");
 		dialog2.insertLast("so we will face many of their slaves who now fight for the enemy boss.");
-		dialog2.insertLast("");
 
 		array<string> dialog3;
 		dialog3.insertLast("In order to proceed to the next chapter, make sure");
@@ -205,7 +206,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog3.insertLast("");
 		dialog3.insertLast("After finishing each enemy wave, a portal will show up");
 		dialog3.insertLast("where you can escape to the next chapter.");
-		dialog3.insertLast("");
 
 		array<string> dialog4;
 		dialog4.insertLast("You are equipped with three different weapons");
@@ -213,7 +213,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog4.insertLast("");
 		dialog4.insertLast("Pay attention to the various items on each level");
 		dialog4.insertLast("which supply you with more ammunition or health.");
-		dialog4.insertLast("");
 
 		array<string> dialog5;
 		dialog5.insertLast("");
@@ -222,9 +221,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog5.insertLast("");
 		dialog5.insertLast("Now it is up to you!");
 		dialog5.insertLast("Good luck, soldier!");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
@@ -244,7 +240,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("Tho fascinating and definitely beautiful, these monsters will not");
 		dialog1.insertLast("hesitate to show you their power. So keep a distance while fighting");
 		dialog1.insertLast("against them.");
-		dialog1.insertLast("");
 
 		array<string> dialog2;
 		dialog2.insertLast("You can use dodging to evade the monsters attacks,");
@@ -252,14 +247,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog2.insertLast("");
 		dialog2.insertLast("So, keep an eye open for health items, which you may need when");
 		dialog2.insertLast("dealing with them.");
-		dialog2.insertLast("");
 
 		array<string> dialog3;
 		dialog3.insertLast("I'll get back to you, when we have reached the next level.");
-		dialog3.insertLast("but beware that some of them have direct impact when attacking.");
 		dialog3.insertLast("");
 		dialog3.insertLast("Good luck, soldier!");
-		dialog3.insertLast("");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
@@ -276,7 +268,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("These are not slaves from other planets. These are specifically bred");
 		dialog1.insertLast("for only one reason: Defeat all intruders who want to come too close to");
 		dialog1.insertLast("the boss!");
-		dialog1.insertLast("");
 
 		array<string> dialog2;
 		dialog2.insertLast("So, ready your weaponry and show them what we can do.");
@@ -285,7 +276,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog2.insertLast("to the enemy boss via the next portal.");
 		dialog2.insertLast("");
 		dialog2.insertLast("I count on you... Good luck, soldier!");
-		dialog2.insertLast("");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
@@ -302,7 +292,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("The one who is responsible for all that evil who struck our planet.");
 		dialog1.insertLast("It's time to show the boss its place. This was the last time it");
 		dialog1.insertLast("tried to enlarge its reign of tyranny.");
-		dialog1.insertLast("");
 
 		array<string> dialog2;
 		dialog2.insertLast("However the boss will surely not give up defenseless.");
@@ -311,7 +300,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog2.insertLast("");
 		dialog2.insertLast("Please keep your distance, use your dodging and also stay away");
 		dialog2.insertLast("from its direct impact weapons.");
-		dialog2.insertLast("");
 
 		array<string> dialog3;
 		dialog3.insertLast("I know you can defeat it. ");
@@ -319,11 +307,45 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog3.insertLast("");
 		dialog3.insertLast("");
 		dialog3.insertLast("Good luck, soldier!");
-		dialog3.insertLast("");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 		this.m_oInfoMenu.AddDialog(dialog3);
+	}
+
+	//Load boss defeated dialog
+	void LoadBossDefeatedDialog()
+	{
+		this.m_oInfoMenu.Clear();
+
+		array<string> dialog1;
+		dialog1.insertLast("I can't believe it, but...!");
+		dialog1.insertLast("");
+		dialog1.insertLast("WE ARE VICTORIOUS!");
+		dialog1.insertLast("");
+		dialog1.insertLast("We have defeated the boss and its minions and thus the invasion is over.");
+		dialog1.insertLast("It was a wild and uncertain ride, but we finally won the battle of our lifes.");
+
+		array<string> dialog2;
+		dialog2.insertLast("Now we need to focus on rebuilding our civilization.");
+		dialog2.insertLast("");
+		dialog2.insertLast("This won't be easy, but I am sure we will manage that");
+		dialog2.insertLast("task, too. Well, as long as we all stand together.");
+		dialog2.insertLast("");
+		dialog2.insertLast("However, this is a different story.");
+		dialog2.insertLast("You can now travel back to earth using the portal.");
+
+		array<string> dialog3;
+		dialog3.insertLast("");
+		dialog3.insertLast("I just hope that we are safe from further invasions now...");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
+
+		this.m_oInfoMenu.Start();
+
+		this.m_bBossDefeatedDlgOpen = true;
 	}
 	
 	//Aim at screen view position
@@ -430,6 +452,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			} else {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			}
+		}
+
+		//Process check for bot defeated case
+		if ((CVar_GetBool("game_completed", false)) && (!this.m_bBossDefeatedDlgOpen)) {
+			this.LoadBossDefeatedDialog();
 		}
 
 		//Process game counter
@@ -937,7 +964,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		if (this.m_tmrGameCounter.IsActive()) {
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive())) {
 			return;
 		}
 		
@@ -1052,7 +1079,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 
-		if (this.m_tmrGameCounter.IsActive()) {
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive())) {
 			return;
 		}
 
