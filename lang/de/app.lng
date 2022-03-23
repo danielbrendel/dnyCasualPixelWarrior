@@ -1,4 +1,5 @@
 mainmenu.resumegame:Zurück zum Spiel
+mainmenu.savegame:Spiel speichern
 mainmenu.stopgame:Spiel beenden
 mainmenu.play:Spielen
 mainmenu.mods:Modifikationen
@@ -6,9 +7,12 @@ mainmenu.settings:Einstellungen
 mainmenu.quit:Beenden
 playmenu.btnplay:Neues Spiel
 playmenu.btnload:Spiel laden
+playmenu.btndelete:Löschen
 playmenu.savedgames:Gespeicherte Spiele
 playmenu.nosavedgamesyet:Noch keine gespeicherten Spiele vorhanden
 playmenu.info.selectgamestate:Bitte zuerst einen Spielstand auswählen
+playmenu.info.gamestatedeleted:Der Spielstand wurde entfernt
+playmenu.info.itemremovalfailure:Konnte Spielstand nicht entfernen
 packagemenu.btnplay:Spielen
 packagemenu.btnbrowse:Workshop durchsuchen
 packagemenu.nomodsfound:Keine Mods gefunden
@@ -22,6 +26,7 @@ settingsmenu.gfx.restarthint:Hinweis: Ändern der Grafik/UI Einstellungen führt
 settingsmenu.gfx.info.saved:Einstellungen gespeichert!
 settingsmenu.snd.btnsave:Speichern
 settingsmenu.snd.volume:Lautstärke: 
+settingsmenu.snd.lblplaymusic:Musik abspielen
 settingsmenu.snd.info.saved:Einstellungen gespeichert!
 settingsmenu.tabs.bindings:Eingabe  
 settingsmenu.tabs.gfxui:Grafik/UI
