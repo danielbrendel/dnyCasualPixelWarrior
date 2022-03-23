@@ -56,7 +56,7 @@ class CWorldTheme : IScriptedEntity
 			
 			int sndPercent = C_MUSIC_VOLUME_PERCENT * S_GetCurrentVolume() / 100;
 			
-			S_PlaySound(this.m_hTheme, sndPercent, true);
+			//S_PlaySound(this.m_hTheme, sndPercent, true);
 		}
 	}
 	

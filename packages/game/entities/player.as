@@ -584,6 +584,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+					} else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
 				} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
 					if (HUD_GetAmmoItemCurrent("laser") > 0) {
@@ -597,6 +600,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						HUD_UpdateAmmoItem("laser", HUD_GetAmmoItemCurrent("laser") - 1, HUD_GetAmmoItemMax("laser"));
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}  else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
 				} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
@@ -625,6 +631,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+					} else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
 				}
 			}
