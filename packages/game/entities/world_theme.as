@@ -21,7 +21,8 @@ class CWorldTheme : IScriptedEntity
 	Model m_oModel;
 	SoundHandle m_hTheme;
 	string m_szTheme;
-	bool m_bProcessOnce;
+	Timer m_tmrMusicCheck;
+	bool m_bStoppedPreviously;
 	
 	CWorldTheme()
 	{
@@ -32,13 +33,24 @@ class CWorldTheme : IScriptedEntity
 	{
 		this.m_szTheme = szTheme;
 	}
+
+	//Play theme
+	void PlayTheme()
+	{
+		int sndPercent = C_MUSIC_VOLUME_PERCENT * S_GetCurrentVolume() / 100;
+			
+		S_PlaySound(this.m_hTheme, sndPercent, true);
+	}
 	
 	//Called for entity spawn
 	void OnSpawn(const Vector& in vec)
 	{
 		this.m_vecPos = vec;
 		this.m_hTheme = S_QuerySound(GetPackagePath() + "sound\\" + this.m_szTheme + ".wav");
-		this.m_bProcessOnce = false;
+		this.m_bStoppedPreviously = true;
+		this.m_tmrMusicCheck.SetDelay(500);
+		this.m_tmrMusicCheck.Reset();
+		this.m_tmrMusicCheck.SetActive(true);
 		this.m_oModel.Alloc();
 	}
 	
@@ -51,12 +63,19 @@ class CWorldTheme : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
-		if (!this.m_bProcessOnce) {
-			this.m_bProcessOnce = true;
-			
-			int sndPercent = C_MUSIC_VOLUME_PERCENT * S_GetCurrentVolume() / 100;
-			
-			//S_PlaySound(this.m_hTheme, sndPercent, true);
+		this.m_tmrMusicCheck.Update();
+		if (this.m_tmrMusicCheck.IsElapsed()) {
+			this.m_tmrMusicCheck.Reset();
+
+			if (!CVar_GetBool("snd_playmusic", false)) {
+				S_StopSound(this.m_hTheme);
+				this.m_bStoppedPreviously = true;
+			} else {
+				if (this.m_bStoppedPreviously) {
+					this.PlayTheme();
+					this.m_bStoppedPreviously = false;
+				}
+			}
 		}
 	}
 	
