@@ -20,6 +20,7 @@ string g_szPackagePath = "";
 #include "tankcls.as"
 #include "infomenu.as"
 #include "mapselectmenu.as"
+#include "waveinfomenu.as"
 
 /* Player animation manager */
 class CPlayerAnimation {
@@ -160,6 +161,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	SpriteHandle m_hCursor;
 	bool m_bBossDefeatedDlgOpen;
 	CMapSelectMenu m_oSelectMenu;
+	CWaveInfoMenu m_oWaveInfoMenu;
 	
 	CPlayerEntity()
     {
@@ -182,6 +184,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		this.m_oInfoMenu = CInfoMenu();
 		this.m_oSelectMenu = CMapSelectMenu();
+		this.m_oWaveInfoMenu = CWaveInfoMenu();
     }
 
 	//Load greenland dialog
@@ -423,6 +426,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
+		int coins = HUD_GetCollectableCount("coins");
+		Props_SaveToFile("coins:" + formatInt(coins) + ";", "player.props");
 	}
 	
 	//Process entity stuff
@@ -432,9 +437,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if (!this.m_bProcessOnce) {
 			this.m_bProcessOnce = true;
 
-			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FIRST_START")) {
+			/*if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FIRST_START")) {
 				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
-			}
+			}*/
 
 			if (GetCurrentMap() == "greenland.cfg") {
 				this.LoadGreenlandDialog();
@@ -449,6 +454,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 			this.m_oSelectMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+			this.m_oWaveInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 
 			if (GetCurrentMap() != "basis.cfg") {
 				this.m_oInfoMenu.Start();
@@ -491,6 +497,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		this.m_oInfoMenu.Process();
 		this.m_oSelectMenu.Process();
+		this.m_oWaveInfoMenu.Process();
 
 		if (this.m_uiGameCounter < GAME_COUNTER_MAX) {
 			return;
@@ -803,6 +810,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			CVar_SetString("mapsel_enter_world", "");
 			LoadMap(szShallLoadMap);
 		}
+
+		//Show wave info menu
+		if (this.m_uiHealth == 0) {
+			this.m_oWaveInfoMenu.Start();
+		}
 	}
 	
 	//Entity can draw everything in default order here
@@ -893,8 +905,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		this.m_oInfoMenu.Draw();
 		this.m_oSelectMenu.Draw();
+		this.m_oWaveInfoMenu.Draw();
 
-		if ((this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive())) {
+		if ((this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
 			R_DrawSprite(this.m_hCursor, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 		} else {
 			R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
@@ -904,7 +917,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return this.m_uiHealth == 0;
+		return false;
 	}
 	
 	//Indicate if entity can be dormant
@@ -1004,7 +1017,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive())) {
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
 			return;
 		}
 		
@@ -1125,7 +1138,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive())) {
+		if (this.m_oWaveInfoMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oWaveInfoMenu.OnMouseClick();
+			}
+		}
+
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
 			return;
 		}
 
@@ -1155,7 +1174,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oInfoMenu.OnUpdateCursorPos(pos);
 
 		//Inform selection menu
-		this.m_oSelectMenu.OnUpdateCursorPos(pos);	
+		this.m_oSelectMenu.OnUpdateCursorPos(pos);
+
+		//Inform wave info menu
+		this.m_oWaveInfoMenu.OnUpdateCursorPos(pos);	
 	}
 	
 	//Return save game properties
@@ -1230,6 +1252,11 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 
 	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
+	CVar_Register("player_coins", CVAR_TYPE_INT, "0");
+
+	string props = Props_GetFromFile("player.props");
+	int coins = parseInt(Props_ExtractValue(props, "coins"));
+	HUD_UpdateCollectable("coins", coins);
 }
 
 //Restore game state
