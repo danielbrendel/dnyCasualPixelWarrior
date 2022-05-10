@@ -459,9 +459,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (GetCurrentMap() != "basis.cfg") {
 				this.m_oInfoMenu.Start();
 			} else {
-				this.m_oSelectMenu.AddMap("greenland", "Green meadow lands");
-				this.m_oSelectMenu.AddMap("snowland", "The snowy frozen neverlands");
-				this.m_oSelectMenu.AddMap("wasteland", "The intoxicated wastelands");
+				this.m_oSelectMenu.AddMap("greenland", "Green meadow lands", true);
+				this.m_oSelectMenu.AddMap("snowland", "The snowy frozen neverlands", CVar_GetBool("snowland_unlocked", false));
+				this.m_oSelectMenu.AddMap("wasteland", "The intoxicated wastelands", CVar_GetBool("wasteland_unlocked", false));
+				this.m_oSelectMenu.AddMap("lavaland", "A very unpleasant environment", CVar_GetBool("lavaland_unlocked", false));
 
 				this.m_uiGameCounter = GAME_COUNTER_MAX;
 				this.m_tmrGameCounter.SetActive(false);
@@ -1253,10 +1254,20 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
 	CVar_Register("player_coins", CVAR_TYPE_INT, "0");
+	CVar_Register("snowland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("lavaland_unlocked", CVAR_TYPE_BOOL, "0");
 
 	string props = Props_GetFromFile("player.props");
 	int coins = parseInt(Props_ExtractValue(props, "coins"));
+	int snowlandUnlocked = parseInt(Props_ExtractValue(props, "snowland"));
+	int wastelandUnlocked = parseInt(Props_ExtractValue(props, "wasteland"));
+	int lavalandUnlocked = parseInt(Props_ExtractValue(props, "lavaland"));
+
 	HUD_UpdateCollectable("coins", coins);
+	CVar_SetBool("snowland_unlocked", snowlandUnlocked > 0);
+	CVar_SetBool("wasteland_unlocked", wastelandUnlocked > 0);
+	CVar_SetBool("lavaland_unlocked", lavalandUnlocked > 0);
 }
 
 //Restore game state

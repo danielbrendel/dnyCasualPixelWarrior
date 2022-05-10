@@ -50,7 +50,7 @@ class CWorldPortal : IScriptedEntity
 
         BoundingBox bbox;
         bbox.Alloc();
-        bbox.AddBBoxItem(Vector(0, 0), Vector(400, 300));
+        bbox.AddBBoxItem(Vector(-50, -50), Vector(150, 100));
 		this.m_oModel.Alloc();
         this.m_oModel.Initialize2(bbox, this.m_hPortal[0]);
 	}

@@ -14,6 +14,8 @@
 class MapInfo {
     string szMap;
     string szText;
+    bool bUnlocked;
+    SpriteHandle hSign;
 }
 
 /* Map selection menu */
@@ -29,7 +31,7 @@ class CMapSelectMenu {
 
     CMapSelectMenu()
     {
-        this.m_vecSize = Vector(500, 380);
+        this.m_vecSize = Vector(500, 500);
         this.m_bActive = false;
         this.m_hVad = R_LoadSprite(GetPackagePath() + "gfx\\vad.png", 4, 29, 35, 4, false);
         this.m_uiVadIndex = 0;
@@ -39,11 +41,19 @@ class CMapSelectMenu {
     }
 
     //Add dialog to menu
-    void AddMap(string szMap, string szDisplayText)
+    void AddMap(string szMap, string szDisplayText, bool bUnlocked)
     {
         MapInfo mapInfo;
         mapInfo.szMap = szMap;
         mapInfo.szText = szDisplayText;
+        mapInfo.bUnlocked = bUnlocked;
+
+        if (bUnlocked) {
+            mapInfo.hSign = R_LoadSprite(GetPackagePath() + "gfx\\unlocked.png", 1, 50, 50, 1, true);
+        } else {
+            mapInfo.hSign = R_LoadSprite(GetPackagePath() + "gfx\\locked.png", 1, 50, 50, 1, true);
+        }
+
         this.m_arrMapInfo.insertLast(mapInfo);
     }
 
@@ -92,15 +102,24 @@ class CMapSelectMenu {
 
         R_DrawSprite(this.m_hVad, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + 30), this.m_uiVadIndex, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 
-        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.title", "Choose a world to enter"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 10), Color(50, 50, 50, 255));
+        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.title", "Choose a world to enter"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 50), Color(50, 150, 50, 255));
 
         for (size_t i = 0; i < this.m_arrMapInfo.length(); i++) {
-            Color sItemColor = Color(50, 50, 50, 255);
-            if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] - 15 >= this.m_vecPos[1] + 50 + i * 30) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 150) && (this.m_vecCursorPos[1] - 15 < this.m_vecPos[1] + 50 + i * 30 + 15)) {
-                sItemColor = Color(80, 80, 80, 255);
+            bool bDrawOverlay = false;
+            if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] - 15 >= this.m_vecPos[1] + 100 + i * 80) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + this.m_vecSize[0] - 20) && (this.m_vecCursorPos[1] - 15 < this.m_vecPos[1] + 100 + i * 80 + 80)) {
+                bDrawOverlay = true;
             }
 
-            R_DrawString(R_GetDefaultFont(), this.m_arrMapInfo[i].szText, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 50 + i * 30), sItemColor);
+            R_DrawBox(Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 100 + i * 80), Vector(this.m_vecSize[0] - 20, 80), 2, Color(50, 50, 50, 255));
+
+            if (bDrawOverlay) {
+                R_DrawFilledBox(Vector(this.m_vecPos[0] + 12, this.m_vecPos[1] + 102 + i * 80), Vector(this.m_vecSize[0] - 20 - 2, 80 - 2), Color(180, 180, 180, 100));
+            }
+
+            R_DrawString(R_GetDefaultFont(), this.m_arrMapInfo[i].szMap, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + 100 + i * 80 + 15), Color(50, 50, 50, 255));
+            R_DrawString(R_GetDefaultFont(), this.m_arrMapInfo[i].szText, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + 100 + i * 80 + 55), Color(80, 80, 80, 255));
+
+            R_DrawSprite(this.m_arrMapInfo[i].hSign, Vector(this.m_vecPos[0] + 10 + this.m_vecSize[0] - 100, this.m_vecPos[1] + 100 + i * 80 + 15), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
         }
 
         Color sColor;
@@ -136,9 +155,11 @@ class CMapSelectMenu {
             this.m_bActive = false;
         } else {
             for (size_t i = 0; i < this.m_arrMapInfo.length(); i++) {
-                if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] - 15 >= this.m_vecPos[1] + 50 + i * 30) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 150) && (this.m_vecCursorPos[1] - 15 < this.m_vecPos[1] + 50 + i * 30 + 15)) {
-                    CVar_SetString("mapsel_enter_world", this.m_arrMapInfo[i].szMap);
-                    this.m_bActive = false;
+                if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] - 15 >= this.m_vecPos[1] + 100 + i * 80) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + this.m_vecSize[0] - 20) && (this.m_vecCursorPos[1] - 15 < this.m_vecPos[1] + 100 + i * 80 + 80)) {
+                    if (this.m_arrMapInfo[i].bUnlocked) {
+                        CVar_SetString("mapsel_enter_world", this.m_arrMapInfo[i].szMap);
+                        this.m_bActive = false;
+                    }
                 }
             }
         }
