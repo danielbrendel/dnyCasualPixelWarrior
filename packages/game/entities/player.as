@@ -427,7 +427,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	void OnRelease()
 	{
 		int coins = HUD_GetCollectableCount("coins");
-		Props_SaveToFile("coins:" + formatInt(coins) + ";", "player.props");
+		int basisHint = (CVar_GetBool("basis_hint", false)) ? 1 : 0;
+		int snowlandUnlocked = (CVar_GetBool("snowland_unlocked", false)) ? 1 : 0;
+		int wastelandUnlocked = (CVar_GetBool("wasteland_unlocked", false)) ? 1 : 0;
+		int lavalandUnlocked = (CVar_GetBool("lavaland_unlocked", false)) ? 1 : 0;
+
+		Props_SaveToFile("coins:" + formatInt(coins) + ";" + "basishint:" + formatInt(basisHint) + ";" + "snowland:" + formatInt(snowlandUnlocked) + ";" + "wasteland:" + formatInt(wastelandUnlocked) + ";" + "lavaland:" + formatInt(lavalandUnlocked) + ";", "player.props");
 	}
 	
 	//Process entity stuff
@@ -1257,17 +1262,20 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("snowland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("lavaland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("basis_hint", CVAR_TYPE_BOOL, "0");
 
 	string props = Props_GetFromFile("player.props");
 	int coins = parseInt(Props_ExtractValue(props, "coins"));
 	int snowlandUnlocked = parseInt(Props_ExtractValue(props, "snowland"));
 	int wastelandUnlocked = parseInt(Props_ExtractValue(props, "wasteland"));
 	int lavalandUnlocked = parseInt(Props_ExtractValue(props, "lavaland"));
+	int basisHint = parseInt(Props_ExtractValue(props, "basishint"));
 
 	HUD_UpdateCollectable("coins", coins);
 	CVar_SetBool("snowland_unlocked", snowlandUnlocked > 0);
 	CVar_SetBool("wasteland_unlocked", wastelandUnlocked > 0);
 	CVar_SetBool("lavaland_unlocked", lavalandUnlocked > 0);
+	CVar_SetBool("basis_hint", basisHint > 0);
 }
 
 //Restore game state
