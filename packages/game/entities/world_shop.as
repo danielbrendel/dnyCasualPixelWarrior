@@ -40,7 +40,7 @@ class CWorldShop : IScriptedEntity
 
         BoundingBox bbox;
         bbox.Alloc();
-        bbox.AddBBoxItem(Vector(-50, -50), Vector(130, 180));
+        bbox.AddBBoxItem(Vector(-150, -150), Vector(150, 250));
 		this.m_oModel.Alloc();
         this.m_oModel.Initialize2(bbox, this.m_hShop);
 	}
@@ -107,14 +107,14 @@ class CWorldShop : IScriptedEntity
         if (ref.GetName() == "player") {
 			if (!this.m_bAgainOnce) {
 				this.m_bAgainOnce = true;
-
+				
 				if (!CVar_GetBool("show_shop_menu", false)) {
 					CVar_SetBool("show_shop_menu", true);
 				}
 			} else {
 				if (this.m_tmrShowMenuAgain.IsElapsed()) {
 					this.m_tmrShowMenuAgain.Reset();
-
+					
 					if (!CVar_GetBool("show_shop_menu", false)) {
 						CVar_SetBool("show_shop_menu", true);
 					}

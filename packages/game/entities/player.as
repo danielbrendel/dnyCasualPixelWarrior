@@ -21,6 +21,7 @@ string g_szPackagePath = "";
 #include "infomenu.as"
 #include "mapselectmenu.as"
 #include "waveinfomenu.as"
+#include "shopmenu.as"
 
 /* Player animation manager */
 class CPlayerAnimation {
@@ -162,6 +163,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	bool m_bBossDefeatedDlgOpen;
 	CMapSelectMenu m_oSelectMenu;
 	CWaveInfoMenu m_oWaveInfoMenu;
+	CShopMenu m_oShopMenu;
 	
 	CPlayerEntity()
     {
@@ -185,6 +187,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oInfoMenu = CInfoMenu();
 		this.m_oSelectMenu = CMapSelectMenu();
 		this.m_oWaveInfoMenu = CWaveInfoMenu();
+		this.m_oShopMenu = CShopMenu();
     }
 
 	//Load greenland dialog
@@ -460,6 +463,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 			this.m_oSelectMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 			this.m_oWaveInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+			this.m_oShopMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 
 			if (GetCurrentMap() != "basis.cfg") {
 				this.m_oInfoMenu.Start();
@@ -504,6 +508,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oInfoMenu.Process();
 		this.m_oSelectMenu.Process();
 		this.m_oWaveInfoMenu.Process();
+		this.m_oShopMenu.Process();
 
 		if (this.m_uiGameCounter < GAME_COUNTER_MAX) {
 			return;
@@ -810,6 +815,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_uiButtons = 0;
 		}
 
+		//Shop menu
+		if (CVar_GetBool("show_shop_menu", false)) {
+			this.m_oShopMenu.Start();
+			CVar_SetBool("show_shop_menu", false);
+			this.m_uiButtons = 0;
+		}
+
 		//Enter world if requested
 		string szShallLoadMap = CVar_GetString("mapsel_enter_world", "");
 		if (szShallLoadMap != "") {
@@ -912,8 +924,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oInfoMenu.Draw();
 		this.m_oSelectMenu.Draw();
 		this.m_oWaveInfoMenu.Draw();
+		this.m_oShopMenu.Draw();
 
-		if ((this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
+		if ((this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			R_DrawSprite(this.m_hCursor, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 		} else {
 			R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
@@ -1023,7 +1036,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			return;
 		}
 		
@@ -1150,7 +1163,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive())) {
+		if (this.m_oShopMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oShopMenu.OnMouseClick();
+			}
+		}
+
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			return;
 		}
 
@@ -1183,7 +1202,10 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oSelectMenu.OnUpdateCursorPos(pos);
 
 		//Inform wave info menu
-		this.m_oWaveInfoMenu.OnUpdateCursorPos(pos);	
+		this.m_oWaveInfoMenu.OnUpdateCursorPos(pos);
+
+		//Inform shop menu
+		this.m_oShopMenu.OnUpdateCursorPos(pos);	
 	}
 	
 	//Return save game properties
@@ -1258,6 +1280,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 
 	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
+	CVar_Register("show_shop_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("player_coins", CVAR_TYPE_INT, "0");
 	CVar_Register("snowland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
