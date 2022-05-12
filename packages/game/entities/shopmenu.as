@@ -13,19 +13,24 @@
 
 const int SHOP_CAT_WEAPONS = 1;
 const int SHOP_CAT_AMMO = 2;
-const int SHOP_CAT_BOOSTER = 3;
+const int SHOP_CAT_WORLDS = 3;
+const int SHOP_ITEMS_DISPLAY = 4;
+const int SHOP_ITEM_CHARACTER_MAXLEN = 13;
 
 class ShopItem {
-    size_t uiIdent;
+    string szIdent;
     string szName;
     string szDescription;
     SpriteHandle hIcon;
     int iPrice;
+    int iCategory;
 }
 
 /* Shop menu */
 class CShopMenu {
-    array<ShopItem> m_arrShopItems;
+    array<ShopItem> m_arrShopItemWeapons;
+    array<ShopItem> m_arrShopItemAmmo;
+    array<ShopItem> m_arrShopItemWorlds;
     bool m_bActive;
     Vector m_vecPos;
     Vector m_vecSize;
@@ -35,6 +40,8 @@ class CShopMenu {
     Timer m_tmrVadAnim;
     SpriteHandle m_hCoin;
     int m_iTabSelection;
+    int m_iItemIndex;
+    int m_iSelectedItem;
 
     CShopMenu()
     {
@@ -47,6 +54,87 @@ class CShopMenu {
         this.m_tmrVadAnim.SetActive(true);
         this.m_hCoin = R_LoadSprite(GetPackagePath() + "gfx\\coin.png", 1, 40, 47, 1, false);
         this.m_iTabSelection = 1;
+        this.m_iItemIndex = 0;
+        this.m_iSelectedItem = -1;
+
+        this.AddItem("item_test", "Weapon Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item - Last", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+
+        this.AddItem("item_test", "Ammo Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("item_test", "Ammo Item - Last", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+
+        this.AddItem("item_test", "World Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("item_test", "World Item - End", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+    }
+
+    //Add shop item
+    void AddItem(string szIdent, string szName, string szDescription, string szIcon, int iPrice, int iCategory)
+    {
+        ShopItem item = ShopItem();
+        item.szIdent = szIdent;
+        item.szName = szName;
+        item.szDescription = szDescription;
+        item.iPrice = iPrice;
+        item.hIcon = R_LoadSprite(GetPackagePath() + "gfx\\" + szIcon, 1, 64, 64, 1, false);
+        item.iCategory = iCategory;
+
+        if (iCategory == SHOP_CAT_WEAPONS) {
+            this.m_arrShopItemWeapons.insertLast(item);
+        } else if (iCategory == SHOP_CAT_AMMO) {
+            this.m_arrShopItemAmmo.insertLast(item);
+        } else if (iCategory == SHOP_CAT_WORLDS) {
+            this.m_arrShopItemWorlds.insertLast(item);
+        }
+    }
+
+    //Scroll to left
+    void ScrollLeft()
+    {
+        if (this.m_iItemIndex > 0) {
+            this.m_iItemIndex--;
+        }
+    }
+
+    //Scroll to right
+    void ScrollRight()
+    {
+        if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
+            if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY < this.m_arrShopItemWeapons.length()) {
+                this.m_iItemIndex++;
+            }
+        } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
+            if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY < this.m_arrShopItemAmmo.length()) {
+                this.m_iItemIndex++;
+            }
+        } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
+            if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY < this.m_arrShopItemWorlds.length()) {
+                this.m_iItemIndex++;
+            }
+        }
     }
 
     //Set menu position
@@ -101,25 +189,107 @@ class CShopMenu {
 
         Color colCatWeapons = Color(50, 50, 50, 255);
         Color colCatAmmo = Color(50, 50, 50, 255);
-        Color colCatBooster = Color(50, 50, 50, 255);
+        Color colCatWorlds = Color(50, 50, 50, 255);
 
         if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
             colCatWeapons = Color(100, 100, 100, 255);
         } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
             colCatAmmo = Color(100, 100, 100, 255);
-        } else if (this.m_iTabSelection == SHOP_CAT_BOOSTER) {
-            colCatBooster = Color(100, 100, 100, 255);
+        } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
+            colCatWorlds = Color(100, 100, 100, 255);
         }
 
         R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.weapons", "Weapons"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 100), colCatWeapons);
         R_DrawString(R_GetDefaultFont(), " | ", Vector(this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10, this.m_vecPos[1] + 100), Color(50, 50, 50, 255));
         R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.ammo", "Ammo"), Vector(this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3, this.m_vecPos[1] + 100), colCatAmmo);
         R_DrawString(R_GetDefaultFont(), " | ", Vector(this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10, this.m_vecPos[1] + 100), Color(50, 50, 50, 255));
-        R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.booster", "Booster"), Vector(this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3, this.m_vecPos[1] + 100), colCatBooster);
+        R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.worlds", "Worlds"), Vector(this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3, this.m_vecPos[1] + 100), colCatWorlds);
 
-        for (size_t i = 0; i < this.m_arrShopItems.length(); i++) {
-            
+        int iItemLoop = 0;
+        this.m_iSelectedItem = -1;
+
+        if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
+            for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
+                if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWeapons.length()) {
+                    int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
+
+                    if (this.MouseInsideProductItem(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130))) {
+                        R_DrawBox(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130), 2, Color(100, 100, 100, 255));
+                        this.m_iSelectedItem = i;
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), this.m_arrShopItemWeapons[i].szName, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 150), Color(100, 100, 100, 255));
+                    R_DrawSprite(this.m_arrShopItemWeapons[i].hIcon, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 183), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+
+                    Color colAffordable = Color(200, 30, 30, 255);
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[i].iPrice >= 0) {
+                        colAffordable = Color(30, 200, 30, 255);
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWeapons[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+
+                    iItemLoop++;
+                }
+            }
+        } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
+            for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
+                if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemAmmo.length()) {
+                    int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
+
+                    if (this.MouseInsideProductItem(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130))) {
+                        R_DrawBox(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130), 2, Color(100, 100, 100, 255));
+                        this.m_iSelectedItem = i;
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), this.m_arrShopItemAmmo[i].szName, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 150), Color(100, 100, 100, 255));
+                    R_DrawSprite(this.m_arrShopItemAmmo[i].hIcon, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 183), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+
+                    Color colAffordable = Color(200, 30, 30, 255);
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[i].iPrice >= 0) {
+                        colAffordable = Color(30, 200, 30, 255);
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemAmmo[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+
+                    iItemLoop++;
+                }
+            }
+        } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
+            for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
+                if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWorlds.length()) {
+                    int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
+
+                    if (this.MouseInsideProductItem(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130))) {
+                        R_DrawBox(Vector(this.m_vecPos[0] + iSpacing, this.m_vecPos[1] + 140), Vector(10 * SHOP_ITEM_CHARACTER_MAXLEN, 130), 2, Color(100, 100, 100, 255));
+                        this.m_iSelectedItem = i;
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), this.m_arrShopItemWorlds[i].szName, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 150), Color(100, 100, 100, 255));
+                    R_DrawSprite(this.m_arrShopItemWorlds[i].hIcon, Vector(this.m_vecPos[0] + 10 + iSpacing, this.m_vecPos[1] + 183), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+
+                    Color colAffordable = Color(200, 30, 30, 255);
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[i].iPrice >= 0) {
+                        colAffordable = Color(30, 200, 30, 255);
+                    }
+
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWorlds[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+
+                    iItemLoop++;
+                }
+            }
         }
+
+        Color colScrollLeft = Color(50, 50, 50, 255);
+        if (this.MouseInsideScrollLeftText()) {
+            colScrollLeft = Color(100, 100, 100, 255);
+        }
+        R_DrawString(R_GetDefaultFont(), "<<", Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 100), colScrollLeft);
+
+        Color colScrollRight = Color(50, 50, 50, 255);
+        if (this.MouseInsideScrollRightText()) {
+            colScrollRight = Color(100, 100, 100, 255);
+        }
+        R_DrawString(R_GetDefaultFont(), ">>", Vector(this.m_vecPos[0] + 50, this.m_vecPos[1] + this.m_vecSize[1] - 100), colScrollRight);
 
         Color sColor;
         if (this.MouseInsideCloseText()) {
@@ -161,10 +331,40 @@ class CShopMenu {
         return false;
     }
 
-    //Indicate if mouse cursor is inside booster category text
-    bool MouseInsideCatBoosterText()
+    //Indicate if mouse cursor is inside worlds category text
+    bool MouseInsideCatWorldsText()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + 111) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3 + _("app.shopmenu.cat.booster", "Booster").length() * 10) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + 111 + 20)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + 111) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + _("app.shopmenu.cat.weapons", "Weapons").length() * 10 + 10 * 3 + _("app.shopmenu.cat.ammo", "Ammo").length() * 10 + 10 * 3 + _("app.shopmenu.cat.worlds", "Worlds").length() * 10) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + 111 + 20)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Indicate if mouse cursor is inside scroll left text
+    bool MouseInsideScrollLeftText()
+    {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 20) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 100) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 20 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 100 + 25)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Indicate if mouse cursor is inside scroll right text
+    bool MouseInsideScrollRightText()
+    {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 50) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 100) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 50 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 100 + 25)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Indicate if mouse cursor is inside product item
+    bool MouseInsideProductItem(const Vector &in vecPos, const Vector &in vecSize)
+    {
+        if ((this.m_vecCursorPos[0] >= vecPos[0]) && (this.m_vecCursorPos[1] >= vecPos[1]) && (this.m_vecCursorPos[0] < vecPos[0] + vecSize[0]) && (this.m_vecCursorPos[1] < vecPos[1] + vecSize[1])) {
             return true;
         }
 
@@ -184,10 +384,48 @@ class CShopMenu {
             this.m_bActive = false;
         } else if (this.MouseInsideCatWeaponsText()) {
             this.m_iTabSelection = SHOP_CAT_WEAPONS;
+            this.m_iItemIndex = 0;
         } else if (this.MouseInsideCatAmmoText()) {
             this.m_iTabSelection = SHOP_CAT_AMMO;
-        } else if (this.MouseInsideCatBoosterText()) {
-            this.m_iTabSelection = SHOP_CAT_BOOSTER;
+            this.m_iItemIndex = 0;
+        } else if (this.MouseInsideCatWorldsText()) {
+            this.m_iTabSelection = SHOP_CAT_WORLDS;
+            this.m_iItemIndex = 0;
+        } else if (this.MouseInsideScrollLeftText()) {
+            this.ScrollLeft();
+        } else if (this.MouseInsideScrollRightText()) {
+            this.ScrollRight();
+        } else {
+            if (this.m_iSelectedItem != -1) {
+                if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice >= 0) {
+                        //Todo: Apply item
+
+                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
+                    } else {
+                        HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
+                    }
+                } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice >= 0) {
+                        //Todo: Apply item
+
+                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
+                    } else {
+                        HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
+                    }
+                } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
+                    if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice >= 0) {
+                        //Todo: Apply item
+
+                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
+                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
+                    } else {
+                        HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
+                    }
+                }
+            }
         }
     }
 
