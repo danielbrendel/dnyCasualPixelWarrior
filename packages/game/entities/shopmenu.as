@@ -68,27 +68,18 @@ class CShopMenu {
         this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
         this.AddItem("item_test", "Weapon Item - Last", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
 
-        this.AddItem("item_test", "Ammo Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
-        this.AddItem("item_test", "Ammo Item - Last", "This is a test item", "missile.png", 20, SHOP_CAT_AMMO);
+        this.AddItem("ammo_pistol_x50", "Pistol x50", "", "handgunhud.png", 50, SHOP_CAT_AMMO);
+        this.AddItem("ammo_shotgun_x25", "Shotgun x25", "", "shotgunhud.png", 100, SHOP_CAT_AMMO);
+        this.AddItem("ammo_lasergun_x25", "Lasergun x25", "", "lasergunhud.png", 100, SHOP_CAT_AMMO);
+        this.AddItem("ammo_grenade_x1", "Grenade x1", "", "grenade.png", 100, SHOP_CAT_AMMO);
+        this.AddItem("ammo_grenade_x5", "Grenade x5", "", "grenade.png", 350, SHOP_CAT_AMMO);
+        this.AddItem("ammo_grenade_x10", "Grenade x10", "", "grenade.png", 500, SHOP_CAT_AMMO);
+        this.AddItem("ammo_grenade_x20", "Grenade x20", "", "grenade.png", 1000, SHOP_CAT_AMMO);
 
-        this.AddItem("item_test", "World Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
-        this.AddItem("item_test", "World Item - End", "This is a test item", "missile.png", 20, SHOP_CAT_WORLDS);
+        this.AddItem("world_greenland", "Greenland", "", "sym_greenland.png", 0, SHOP_CAT_WORLDS);
+        this.AddItem("world_snowland", "Snowland", "", "sym_snowland.png", 500, SHOP_CAT_WORLDS);
+        this.AddItem("world_wasteland", "Wasteland", "", "sym_wasteland.png", 1250, SHOP_CAT_WORLDS);
+        this.AddItem("world_lavaland", "Lavaland", "", "sym_lavaland.png", 1800, SHOP_CAT_WORLDS);
     }
 
     //Add shop item
@@ -226,12 +217,14 @@ class CShopMenu {
                         colAffordable = Color(30, 200, 30, 255);
                     }
 
-                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWeapons[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWeapons[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
 
                     iItemLoop++;
                 }
             }
         } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
+            R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.ammo.temporary", "Note: Additional ammo is only temporary."), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 123), Color(50, 50, 50, 255));
+
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemAmmo.length()) {
                     int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
@@ -249,7 +242,7 @@ class CShopMenu {
                         colAffordable = Color(30, 200, 30, 255);
                     }
 
-                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemAmmo[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemAmmo[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
 
                     iItemLoop++;
                 }
@@ -272,7 +265,7 @@ class CShopMenu {
                         colAffordable = Color(30, 200, 30, 255);
                     }
 
-                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWorlds[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 245), colAffordable);
+                    R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWorlds[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
 
                     iItemLoop++;
                 }
@@ -400,33 +393,78 @@ class CShopMenu {
                 if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice >= 0) {
                         //Todo: Apply item
-
-                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
-                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
                     } else {
                         HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
                     }
                 } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice >= 0) {
-                        //Todo: Apply item
-
-                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
-                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
+                        if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_pistol_x50") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("handgun", HUD_GetAmmoItemCurrent("handgun") + 50, HUD_GetAmmoItemMax("handgun"));
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_shotgun_x25") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("shotgun", HUD_GetAmmoItemCurrent("shotgun") + 25, HUD_GetAmmoItemMax("shotgun"));
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_lasergun_x25") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("laser", HUD_GetAmmoItemCurrent("laser") + 25, HUD_GetAmmoItemMax("laser"));
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x1") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 1);
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x5") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 5);
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x10") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 10);
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x20") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 20);
+                        }
                     } else {
                         HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
                     }
                 } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice >= 0) {
-                        //Todo: Apply item
-
-                        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
-                        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
+                        if (this.m_arrShopItemWorlds[this.m_iSelectedItem].szIdent == "world_greenland") {
+                            HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                        } else if (this.m_arrShopItemWorlds[this.m_iSelectedItem].szIdent == "world_snowland") {
+                            if (!CVar_GetBool("snowland_unlocked", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("snowland_unlocked", true);
+                                CVar_SetString("shop_command", "unlock:snowland;");
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        } else if (this.m_arrShopItemWorlds[this.m_iSelectedItem].szIdent == "world_wasteland") {
+                            if (!CVar_GetBool("wasteland_unlocked", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("wasteland_unlocked", true);
+                                CVar_SetString("shop_command", "unlock:wasteland;");
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        } else if (this.m_arrShopItemWorlds[this.m_iSelectedItem].szIdent == "world_lavaland") {
+                            if (!CVar_GetBool("lavaland_unlocked", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("lavaland_unlocked", true);
+                                CVar_SetString("shop_command", "unlock:lavaland;");
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        }
                     } else {
                         HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
                     }
                 }
             }
         }
+    }
+
+    //Perform the purchasing
+    void PerformPurchase(int iPrice)
+    {
+        HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") - iPrice);
+        HUD_AddMessage(_("app.shopmenu.purchase.itempurchased", "Purchase successful!"), HUD_MSG_COLOR_GREEN);
     }
 
     //Indicate if menu is active

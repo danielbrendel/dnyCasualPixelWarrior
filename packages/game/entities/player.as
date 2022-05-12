@@ -590,7 +590,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		HUD_UpdateHealth(this.m_uiHealth);
 
 		//Process attacking
-		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+		if (((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) && (GetCurrentMap() != "basis.cfg")) {
 			this.m_bShooting = true;
 			this.m_tmrAttack.Update();
 			if (this.m_tmrAttack.IsElapsed()) {
@@ -832,6 +832,17 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		//Show wave info menu
 		if (this.m_uiHealth == 0) {
 			this.m_oWaveInfoMenu.Start();
+		}
+
+		//Process shop commands
+		string szShopCmd = CVar_GetString("shop_command", "");
+		if (szShopCmd.length() > 0) {
+			string szUnlock = Props_ExtractValue(szShopCmd, "unlock");
+			if (szUnlock.length() > 0) {
+				this.m_oSelectMenu.UnlockMap(szUnlock);
+			}
+
+			CVar_SetString("shop_command", "");
 		}
 	}
 	
@@ -1261,22 +1272,6 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
-	
-	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
-	HUD_UpdateAmmoItem("handgun", 125, 0);
-	HUD_SetAmmoDisplayItem("handgun");
-	
-	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 35, 100);
-	
-	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 40, 100);
-	
-	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
-	HUD_UpdateCollectable("grenade", 10);
-	
-	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
-	HUD_UpdateCollectable("coins", 0);
 
 	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
@@ -1286,6 +1281,26 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("lavaland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("basis_hint", CVAR_TYPE_BOOL, "0");
+	CVar_Register("shop_command", CVAR_TYPE_STRING, "");
+	CVar_Register("ammo_max_pistol", CVAR_TYPE_INT, "0");
+	CVar_Register("ammo_max_shotgun", CVAR_TYPE_INT, "200");
+	CVar_Register("ammo_max_lasergun", CVAR_TYPE_INT, "200");
+
+	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
+	HUD_UpdateAmmoItem("handgun", 125, CVar_GetInt("ammo_max_pistol", 0));
+	HUD_SetAmmoDisplayItem("handgun");
+	
+	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
+	HUD_UpdateAmmoItem("laser", 35, CVar_GetInt("ammo_max_lasergun", 0));
+	
+	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
+	HUD_UpdateAmmoItem("shotgun", 40, CVar_GetInt("ammo_max_shotgun", 0));
+	
+	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
+	HUD_UpdateCollectable("grenade", 10);
+	
+	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
+	HUD_UpdateCollectable("coins", 0);
 
 	string props = Props_GetFromFile("player.props");
 	int coins = parseInt(Props_ExtractValue(props, "coins"));

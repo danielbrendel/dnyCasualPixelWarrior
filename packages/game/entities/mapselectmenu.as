@@ -57,6 +57,18 @@ class CMapSelectMenu {
         this.m_arrMapInfo.insertLast(mapInfo);
     }
 
+    //Unlock specific map
+    void UnlockMap(string szMap)
+    {
+        for (int i = 0; i < this.m_arrMapInfo.length(); i++) {
+            if (this.m_arrMapInfo[i].szMap == szMap) {
+                this.m_arrMapInfo[i].bUnlocked = true;
+                this.m_arrMapInfo[i].hSign = R_LoadSprite(GetPackagePath() + "gfx\\unlocked.png", 1, 50, 50, 1, true);
+                break;
+            }
+        }
+    }
+
     //Set menu position
     void SetPosition(const Vector &in vecPos)
     {
