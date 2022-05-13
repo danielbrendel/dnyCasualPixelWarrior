@@ -286,9 +286,9 @@ class CShopMenu {
 
         Color sColor;
         if (this.MouseInsideCloseText()) {
-            sColor = Color(35, 140, 35, 255);
+            sColor = Color(100, 100, 100, 255);
         } else {
-            sColor = Color(30, 120, 30, 255);
+            sColor = Color(50, 50, 50, 255);
         }
 
         R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.close", "Close"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);

@@ -160,7 +160,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	bool m_bProcessOnce;
 	CInfoMenu m_oInfoMenu;
 	SpriteHandle m_hCursor;
-	bool m_bBossDefeatedDlgOpen;
 	CMapSelectMenu m_oSelectMenu;
 	CWaveInfoMenu m_oWaveInfoMenu;
 	CShopMenu m_oShopMenu;
@@ -179,10 +178,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
 		this.m_bProcessOnce = false;
-		this.m_bBossDefeatedDlgOpen = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
-		CVar_Register("game_completed", CVAR_TYPE_BOOL, "0");
 
 		this.m_oInfoMenu = CInfoMenu();
 		this.m_oSelectMenu = CMapSelectMenu();
@@ -190,60 +187,82 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_oShopMenu = CShopMenu();
     }
 
-	//Load greenland dialog
-	void LoadGreenlandDialog()
+	//Load basis dialog
+	void LoadBasisDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("Okay, so the portal has actually worked!");
+		dialog1.insertLast("Welcome soldier!");
 		dialog1.insertLast("");
-		dialog1.insertLast("After they destroyed our beloved planet,");
-		dialog1.insertLast("we finally managed to go through the portal to our enemies planet");
+		dialog1.insertLast("I am VAD, your personal virtual assistance device!");
 		dialog1.insertLast("");
-		dialog1.insertLast("We need to find their leader who controls their mission");
-		dialog1.insertLast("in order to defeat them to save the survivors of their attack.");
-
+		dialog1.insertLast("This is your basis. Here you can travel to far distanced");
+		dialog1.insertLast("worlds to earn coins by defeating waves of enemies.");
+		dialog1.insertLast("");
+		dialog1.insertLast("With these earned coins you can buy upgrades via the shop.");
+		dialog1.insertLast("");
+		
 		array<string> dialog2;
-		dialog2.insertLast("But before we get to the enemies boss, we surely");
-		dialog2.insertLast("have to make our way through their minions.");
-		dialog2.insertLast("");
-		dialog2.insertLast("I sense that the enemy has previously captured a lot of planets,");
-		dialog2.insertLast("so we will face many of their slaves who now fight for the enemy boss.");
+		dialog2.insertLast("The mission you have is endless: Earn more and more coins,");
+		dialog2.insertLast("and invest them in upgrades. The better upgrades you have,");
+		dialog2.insertLast("the longer you will last in the waves of enemies.");
 
 		array<string> dialog3;
-		dialog3.insertLast("In order to proceed to the next chapter, make sure");
-		dialog3.insertLast("you defeat all of their waves spawned against you.");
+		dialog3.insertLast("The tower on the left is your shop.");
 		dialog3.insertLast("");
-		dialog3.insertLast("After finishing each enemy wave, a portal will show up");
-		dialog3.insertLast("where you can escape to the next chapter.");
+		dialog3.insertLast("Use it with your earned coins to buy upgrades.");
+		dialog3.insertLast("");
+		dialog3.insertLast("Upgrades consist of weapons, ammo and unlocking new worlds.");
 
 		array<string> dialog4;
-		dialog4.insertLast("You are equipped with three different weapons");
-		dialog4.insertLast("plus you also got some grenades.");
+		dialog4.insertLast("The portal on the right is your way to travel to other worlds.");
 		dialog4.insertLast("");
-		dialog4.insertLast("Pay attention to the various items on each level");
-		dialog4.insertLast("which supply you with more ammunition or health.");
-
-		array<string> dialog5;
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("Now it is up to you!");
-		dialog5.insertLast("Good luck, soldier!");
+		dialog4.insertLast("In these worlds you will fight endless waves of enemies.");
+		dialog4.insertLast("These enemies will drop coins which you then can invest");
+		dialog4.insertLast("in new upgrades!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 		this.m_oInfoMenu.AddDialog(dialog3);
 		this.m_oInfoMenu.AddDialog(dialog4);
-		this.m_oInfoMenu.AddDialog(dialog5);
+	}
+
+	//Load greenland dialog
+	void LoadGreenlandDialog()
+	{
+		array<string> dialog1;
+		dialog1.insertLast("These realms are the so called greenlands.");
+		dialog1.insertLast("");
+		dialog1.insertLast("It is a fruitful land, with various bioms.");
+		dialog1.insertLast("Altough it is currently occupied by a military force.");
+		dialog1.insertLast("");
+		dialog1.insertLast("You can surely gather some coins from them,");
+		dialog1.insertLast("but don't forget to evade their attacks.");
+
+		array<string> dialog2;
+		dialog2.insertLast("The military force who has occupied this land");
+		dialog2.insertLast("likes to have military from different centuries.");
+		dialog2.insertLast("");
+		dialog2.insertLast("That's why you will meet ballistas, tanks and laser mechs.");
+		dialog2.insertLast("And also they seem to have some tesla towers in place.");
+
+		array<string> dialog3;
+		dialog3.insertLast("So, good luck, soldier.");
+		dialog3.insertLast("");
+		dialog3.insertLast("And don't worry! If you get fragged you will be");
+		dialog3.insertLast("resurrected at your basis!");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
 	}
 
 	//Load snowland dialog
 	void LoadSnowlandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("This time we have to deal with some monsters who now");
-		dialog1.insertLast("work for the enemy.");
+		dialog1.insertLast("Welcome to the snowlands!");
+		dialog1.insertLast("");
+		dialog1.insertLast("It's very cold here, brrr. I hope you are wearing warm clothes!");
 		dialog1.insertLast("");
 		dialog1.insertLast("It's fascinating what diverse species are out there in the universe.");
 		dialog1.insertLast("Tho fascinating and definitely beautiful, these monsters will not");
@@ -251,15 +270,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("against them.");
 
 		array<string> dialog2;
-		dialog2.insertLast("You can use dodging to evade the monsters attacks,");
-		dialog2.insertLast("but beware that some of them have direct impact when attacking.");
+		dialog2.insertLast("There were some people who wanted to tame these monsters");
+		dialog2.insertLast("and keep them as pets. Guess how much luck they had...");
 		dialog2.insertLast("");
-		dialog2.insertLast("So, keep an eye open for health items, which you may need when");
-		dialog2.insertLast("dealing with them.");
+		dialog2.insertLast("So, don't underestimate their power and beware that some are");
+		dialog2.insertLast("close and some are far range attacking monsters.");
 
 		array<string> dialog3;
-		dialog3.insertLast("I'll get back to you, when we have reached the next level.");
-		dialog3.insertLast("");
 		dialog3.insertLast("Good luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
@@ -271,90 +288,52 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	void LoadWastelandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("We are so close to the enemy boss!");
+		dialog1.insertLast("The wastelands! Another realm that is occupied by another");
+		dialog1.insertLast("military force.");
 		dialog1.insertLast("");
-		dialog1.insertLast("We just have to defeat its private army before we can reach it.");
-		dialog1.insertLast("These are not slaves from other planets. These are specifically bred");
-		dialog1.insertLast("for only one reason: Defeat all intruders who want to come too close to");
-		dialog1.insertLast("the boss!");
+		dialog1.insertLast("These guys have caused so much trouble in the universe,");
+		dialog1.insertLast("so that we surely can grab some coins from them, you know...");
 
 		array<string> dialog2;
-		dialog2.insertLast("So, ready your weaponry and show them what we can do.");
+		dialog2.insertLast("I hope you have enough weaponry equipped, because these");
+		dialog2.insertLast("guys do serious business.");
+		dialog2.insertLast("So be sure to avoid their attacks as much as possible!");
 		dialog2.insertLast("");
-		dialog2.insertLast("I am certain you will manage to defeat them, so we can travel");
-		dialog2.insertLast("to the enemy boss via the next portal.");
-		dialog2.insertLast("");
-		dialog2.insertLast("I count on you... Good luck, soldier!");
+		dialog2.insertLast("Best of luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 	}
 
-	//Load bossfight dialog
-	void LoadBossfightDialog()
+	//Load lavaland dialog
+	void LoadLavalandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("Finally... after all this time...");
+		dialog1.insertLast("The lavalands - an unpleasant environment.");
 		dialog1.insertLast("");
-		dialog1.insertLast("WE HAVE REACHED THE BOSS!");
+		dialog1.insertLast("There is not much lifeform here, except one species:");
 		dialog1.insertLast("");
-		dialog1.insertLast("The one who is responsible for all that evil who struck our planet.");
-		dialog1.insertLast("It's time to show the boss its place. This was the last time it");
-		dialog1.insertLast("tried to enlarge its reign of tyranny.");
+		dialog1.insertLast("The aliens! They have occupied these lands and use it");
+		dialog1.insertLast("to build their motherships.");
 
 		array<string> dialog2;
-		dialog2.insertLast("However the boss will surely not give up defenseless.");
+		dialog2.insertLast("These aliens are actually very rich, so we can");
+		dialog2.insertLast("get maaaaaany coins from them.");
 		dialog2.insertLast("");
-		dialog2.insertLast("I can sense that it is armed with heavy weaponry.");
-		dialog2.insertLast("");
-		dialog2.insertLast("Please keep your distance, use your dodging and also stay away");
-		dialog2.insertLast("from its direct impact weapons.");
+		dialog2.insertLast("But beware! They are really strong and heavily armed.");
+		dialog2.insertLast("You will need to have a very good equippment to last");
+		dialog2.insertLast("long enough to earn a sufficient amount of coins.");
 
 		array<string> dialog3;
-		dialog3.insertLast("I know you can defeat it. ");
+		dialog3.insertLast("I hope you got some nice equippment from the shop.");
 		dialog3.insertLast("");
 		dialog3.insertLast("");
 		dialog3.insertLast("");
-		dialog3.insertLast("Good luck, soldier!");
+		dialog3.insertLast("Best of luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 		this.m_oInfoMenu.AddDialog(dialog3);
-	}
-
-	//Load boss defeated dialog
-	void LoadBossDefeatedDialog()
-	{
-		this.m_oInfoMenu.Clear();
-
-		array<string> dialog1;
-		dialog1.insertLast("I can't believe it, but...!");
-		dialog1.insertLast("");
-		dialog1.insertLast("WE ARE VICTORIOUS!");
-		dialog1.insertLast("");
-		dialog1.insertLast("We have defeated the boss and its minions and thus the invasion is over.");
-		dialog1.insertLast("It was a wild and uncertain ride, but we finally won the battle of our lifes.");
-
-		array<string> dialog2;
-		dialog2.insertLast("Now we need to focus on rebuilding our civilization.");
-		dialog2.insertLast("");
-		dialog2.insertLast("This won't be easy, but I am sure we will manage that");
-		dialog2.insertLast("task, too. Well, as long as we all stand together.");
-		dialog2.insertLast("");
-		dialog2.insertLast("However, this is a different story.");
-		dialog2.insertLast("You can now travel back to earth using the portal.");
-
-		array<string> dialog3;
-		dialog3.insertLast("");
-		dialog3.insertLast("I just hope that we are safe from further invasions now...");
-
-		this.m_oInfoMenu.AddDialog(dialog1);
-		this.m_oInfoMenu.AddDialog(dialog2);
-		this.m_oInfoMenu.AddDialog(dialog3);
-
-		this.m_oInfoMenu.Start();
-
-		this.m_bBossDefeatedDlgOpen = true;
 	}
 	
 	//Aim at screen view position
@@ -449,15 +428,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
 			}*/
 
-			if (GetCurrentMap() == "greenland.cfg") {
+			if (GetCurrentMap() == "basis.cfg") {
+				this.LoadBasisDialog();
+			} else if (GetCurrentMap() == "greenland.cfg") {
 				this.LoadGreenlandDialog();
 			} else if (GetCurrentMap() == "snowland.cfg") {
 				this.LoadSnowlandDialog();
 			} else if (GetCurrentMap() == "wasteland.cfg") {
 				this.LoadWastelandDialog();
-			} else if (GetCurrentMap() == "bossfight.cfg") {
-				this.LoadBossfightDialog();
-				HUD_UpdateCollectable("grenade", 3);
+			} else if (GetCurrentMap() == "lavaland.cfg") {
+				this.LoadLavalandDialog();
 			}
 
 			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
@@ -465,9 +445,15 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_oWaveInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 			this.m_oShopMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 
-			if (GetCurrentMap() != "basis.cfg") {
-				this.m_oInfoMenu.Start();
+			if (GetCurrentMap() == "basis.cfg") {
+				if (CVar_GetBool("basis_hint", false)) {
+					this.m_oInfoMenu.Start();
+				}
 			} else {
+				this.m_oInfoMenu.Start();
+			}
+			
+			if (GetCurrentMap() == "basis.cfg") {
 				this.m_oSelectMenu.AddMap("greenland", "Green meadow lands", true);
 				this.m_oSelectMenu.AddMap("snowland", "The snowy frozen neverlands", CVar_GetBool("snowland_unlocked", false));
 				this.m_oSelectMenu.AddMap("wasteland", "The intoxicated wastelands", CVar_GetBool("wasteland_unlocked", false));
@@ -483,11 +469,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			} else {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			}
-		}
-
-		//Process check for bot defeated case
-		if ((CVar_GetBool("game_completed", false)) && (!this.m_bBossDefeatedDlgOpen)) {
-			this.LoadBossDefeatedDialog();
 		}
 
 		//Process game counter
