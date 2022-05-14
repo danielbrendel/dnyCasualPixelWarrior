@@ -1,8 +1,10 @@
-coins:3059
+coins:3065
 basishint:1
 snowland:0
 wasteland:1
 lavaland:0
 lasergun:1
 shotgun:1
+fthrower:1
+plasmagun:1
 
