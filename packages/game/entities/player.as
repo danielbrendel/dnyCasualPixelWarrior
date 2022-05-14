@@ -429,8 +429,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			"lavaland:" + formatInt(lavalandUnlocked) + ";" +
 			"lasergun:" + formatInt(lasergunUnlocked) + ";" +
 			"shotgun:" + formatInt(shotgunUnlocked) + ";" +
-			"fthrower:" + formatInt(shotgunUnlocked) + ";" +
-			"plasmagun:" + formatInt(shotgunUnlocked) + ";"
+			"fthrower:" + formatInt(fthrowerUnlocked) + ";" +
+			"plasmagun:" + formatInt(plasmagunUnlocked) + ";"
 		, "player.props");
 	}
 	

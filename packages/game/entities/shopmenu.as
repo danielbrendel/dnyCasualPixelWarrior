@@ -59,8 +59,8 @@ class CShopMenu {
 
         this.AddItem("weapon_laser", "Lasergun", "", "lasergunhud.png", 500, SHOP_CAT_WEAPONS);
         this.AddItem("weapon_shotgun", "Shotgun", "", "shotgunhud.png", 1000, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "", "locked.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "", "locked.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("weapon_fthrower", "Flamethrower", "", "fthrowerhud.png", 3500, SHOP_CAT_WEAPONS);
+        this.AddItem("weapon_plasma", "Plasma Gun", "", "plasmagunhud.png", 3500, SHOP_CAT_WEAPONS);
 
         this.AddItem("ammo_pistol_x50", "Pistol x50", "", "handgunhud.png", 50, SHOP_CAT_AMMO);
         this.AddItem("ammo_shotgun_x25", "Shotgun x25", "", "shotgunhud.png", 100, SHOP_CAT_AMMO);
@@ -397,6 +397,20 @@ class CShopMenu {
                             if (!CVar_GetBool("weapon_shotgun", false)) {
                                 this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("weapon_shotgun", true);
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        } else if (this.m_arrShopItemWeapons[this.m_iSelectedItem].szIdent == "weapon_fthrower") {
+                            if (!CVar_GetBool("weapon_fthrower", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("weapon_fthrower", true);
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        } else if (this.m_arrShopItemWeapons[this.m_iSelectedItem].szIdent == "weapon_plasma") {
+                            if (!CVar_GetBool("weapon_plasma", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("weapon_plasma", true);
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
