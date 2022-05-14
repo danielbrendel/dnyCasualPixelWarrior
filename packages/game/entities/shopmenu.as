@@ -57,16 +57,10 @@ class CShopMenu {
         this.m_iItemIndex = 0;
         this.m_iSelectedItem = -1;
 
-        this.AddItem("item_test", "Weapon Item - Start", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
-        this.AddItem("item_test", "Weapon Item - Last", "This is a test item", "missile.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("weapon_laser", "Lasergun", "", "lasergunhud.png", 500, SHOP_CAT_WEAPONS);
+        this.AddItem("weapon_shotgun", "Shotgun", "", "shotgunhud.png", 1000, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "", "locked.png", 20, SHOP_CAT_WEAPONS);
+        this.AddItem("item_test", "Weapon Item", "", "locked.png", 20, SHOP_CAT_WEAPONS);
 
         this.AddItem("ammo_pistol_x50", "Pistol x50", "", "handgunhud.png", 50, SHOP_CAT_AMMO);
         this.AddItem("ammo_shotgun_x25", "Shotgun x25", "", "shotgunhud.png", 100, SHOP_CAT_AMMO);
@@ -392,7 +386,21 @@ class CShopMenu {
             if (this.m_iSelectedItem != -1) {
                 if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice >= 0) {
-                        //Todo: Apply item
+                        if (this.m_arrShopItemWeapons[this.m_iSelectedItem].szIdent == "weapon_laser") {
+                            if (!CVar_GetBool("weapon_laser", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("weapon_laser", true);
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        } else if (this.m_arrShopItemWeapons[this.m_iSelectedItem].szIdent == "weapon_shotgun") {
+                            if (!CVar_GetBool("weapon_shotgun", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("weapon_shotgun", true);
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
+                        }
                     } else {
                         HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
                     }

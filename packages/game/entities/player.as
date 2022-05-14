@@ -413,8 +413,17 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		int snowlandUnlocked = (CVar_GetBool("snowland_unlocked", false)) ? 1 : 0;
 		int wastelandUnlocked = (CVar_GetBool("wasteland_unlocked", false)) ? 1 : 0;
 		int lavalandUnlocked = (CVar_GetBool("lavaland_unlocked", false)) ? 1 : 0;
+		int shotgunUnlocked = (CVar_GetBool("weapon_shotgun", false)) ? 1 : 0;
+		int lasergunUnlocked = (CVar_GetBool("weapon_laser", false)) ? 1 : 0;
 
-		Props_SaveToFile("coins:" + formatInt(coins) + ";" + "basishint:" + formatInt(basisHint) + ";" + "snowland:" + formatInt(snowlandUnlocked) + ";" + "wasteland:" + formatInt(wastelandUnlocked) + ";" + "lavaland:" + formatInt(lavalandUnlocked) + ";", "player.props");
+		Props_SaveToFile("coins:" + formatInt(coins) + ";" + 
+			"basishint:" + formatInt(basisHint) + ";" + 
+			"snowland:" + formatInt(snowlandUnlocked) + ";" + 
+			"wasteland:" + formatInt(wastelandUnlocked) + ";" + 
+			"lavaland:" + formatInt(lavalandUnlocked) + ";" +
+			"lasergun:" + formatInt(lasergunUnlocked) + ";" +
+			"shotgun:" + formatInt(shotgunUnlocked) + ";" 
+		, "player.props");
 	}
 	
 	//Process entity stuff
@@ -1126,11 +1135,15 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_iCurrentWeapon = WEAPON_HANDGUN;
 			HUD_SetAmmoDisplayItem("handgun");
 		} else if (vKey == GetKeyBinding("SLOT2")) {
-			this.m_iCurrentWeapon = WEAPON_RIFLE;
-			HUD_SetAmmoDisplayItem("laser");
+			if ((CVar_GetBool("weapon_laser", false)) || (CVar_GetBool("weapon_temp_laser", false))) {
+				this.m_iCurrentWeapon = WEAPON_RIFLE;
+				HUD_SetAmmoDisplayItem("laser");
+			}
 		} else if (vKey == GetKeyBinding("SLOT3")) {
-			this.m_iCurrentWeapon = WEAPON_SHOTGUN;
-			HUD_SetAmmoDisplayItem("shotgun");
+			if ((CVar_GetBool("weapon_shotgun", false)) || (CVar_GetBool("weapon_temp_shotgun", false))) {
+				this.m_iCurrentWeapon = WEAPON_SHOTGUN;
+				HUD_SetAmmoDisplayItem("shotgun");
+			}
 		}
 	}
 	
@@ -1249,10 +1262,6 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	g_szPackagePath = szPath;
 	
 	Ent_SetGoalActivationStatus(false);
-	
-	CPlayerEntity @player = CPlayerEntity();
-	Ent_SpawnEntity(szIdent, @player, vecPos);
-	player.SetRotation(fRot);
 
 	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
 	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
@@ -1266,22 +1275,16 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("ammo_max_pistol", CVAR_TYPE_INT, "0");
 	CVar_Register("ammo_max_shotgun", CVAR_TYPE_INT, "200");
 	CVar_Register("ammo_max_lasergun", CVAR_TYPE_INT, "200");
+	CVar_Register("weapon_laser", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_shotgun", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_laser", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_shotgun", CVAR_TYPE_BOOL, "0");
 
-	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
-	HUD_UpdateAmmoItem("handgun", 125, CVar_GetInt("ammo_max_pistol", 0));
-	HUD_SetAmmoDisplayItem("handgun");
-	
-	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 35, CVar_GetInt("ammo_max_lasergun", 0));
-	
-	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 40, CVar_GetInt("ammo_max_shotgun", 0));
-	
-	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
-	HUD_UpdateCollectable("grenade", 10);
-	
-	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
-	HUD_UpdateCollectable("coins", 0);
+	CVar_SetString("mapsel_enter_world", "");
+
+	CPlayerEntity @player = CPlayerEntity();
+	Ent_SpawnEntity(szIdent, @player, vecPos);
+	player.SetRotation(fRot);
 
 	string props = Props_GetFromFile("player.props");
 	int coins = parseInt(Props_ExtractValue(props, "coins"));
@@ -1289,12 +1292,33 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	int wastelandUnlocked = parseInt(Props_ExtractValue(props, "wasteland"));
 	int lavalandUnlocked = parseInt(Props_ExtractValue(props, "lavaland"));
 	int basisHint = parseInt(Props_ExtractValue(props, "basishint"));
+	int lasergun = parseInt(Props_ExtractValue(props, "lasergun"));
+	int shotgun = parseInt(Props_ExtractValue(props, "shotgun"));
 
-	HUD_UpdateCollectable("coins", coins);
 	CVar_SetBool("snowland_unlocked", snowlandUnlocked > 0);
 	CVar_SetBool("wasteland_unlocked", wastelandUnlocked > 0);
 	CVar_SetBool("lavaland_unlocked", lavalandUnlocked > 0);
 	CVar_SetBool("basis_hint", basisHint > 0);
+	CVar_SetBool("weapon_laser", lasergun > 0);
+	CVar_SetBool("weapon_shotgun", shotgun > 0);
+	CVar_SetBool("weapon_temp_laser", false);
+	CVar_SetBool("weapon_temp_shotgun", false);
+
+	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
+	HUD_UpdateAmmoItem("handgun", 125, CVar_GetInt("ammo_max_pistol", 0));
+	HUD_SetAmmoDisplayItem("handgun");
+
+	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
+	HUD_UpdateAmmoItem("laser", 35, CVar_GetInt("ammo_max_lasergun", 0));
+
+	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
+	HUD_UpdateAmmoItem("shotgun", 40, CVar_GetInt("ammo_max_shotgun", 0));
+	
+	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
+	HUD_UpdateCollectable("grenade", 10);
+	
+	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
+	HUD_UpdateCollectable("coins", coins);
 }
 
 //Restore game state
