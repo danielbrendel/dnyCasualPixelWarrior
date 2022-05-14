@@ -175,6 +175,8 @@ class CWolfdragon : IScriptedEntity
 			coin.SetRandomPos(true);
 			Ent_SpawnEntity("item_coin", @coin, Vector(this.m_vecPos[0] + 120, this.m_vecPos[1] + 65));
 		}
+
+		CVar_SetInt("enemies_defeated", CVar_GetInt("enemies_defeated", 0) + 1);
 	}
 	
 	//Process entity stuff

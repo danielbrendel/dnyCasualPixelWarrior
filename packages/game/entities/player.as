@@ -616,6 +616,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					} else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -633,6 +635,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					}  else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -663,6 +667,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					} else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -680,6 +686,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\flame_shot.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					}  else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -709,6 +717,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					}  else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -730,6 +740,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 					Ent_SpawnEntity("weapon_grenade", @grenade, this.m_vecPos);
 					
 					HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") - 1);
+
+					CVar_SetInt("grenades_thrown", CVar_GetInt("grenades_thrown", 0) + 1);
 				}
 			}
 		}
@@ -786,6 +798,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				if (this.m_uiDodgeCounter >= 5) {
 					this.m_tmrDodging.SetActive(false);
 					this.m_uiDodgeCounter = 0;
+					CVar_SetInt("dodges_count", CVar_GetInt("dodges_count", 0) + 1);
 				}
 			}
 		}
@@ -875,6 +888,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		//Show wave info menu
 		if (this.m_uiHealth == 0) {
+			this.m_uiButtons = 0;
 			this.m_oWaveInfoMenu.Start();
 		}
 
@@ -1349,6 +1363,10 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("weapon_temp_shotgun", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_fthrower", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_plasma", CVAR_TYPE_BOOL, "0");
+	CVar_Register("enemies_defeated", CVAR_TYPE_INT, "0");
+	CVar_Register("shots_fired", CVAR_TYPE_INT, "0");
+	CVar_Register("grenades_thrown", CVAR_TYPE_INT, "0");
+	CVar_Register("dodges_count", CVAR_TYPE_INT, "0");
 
 	CVar_SetString("mapsel_enter_world", "");
 

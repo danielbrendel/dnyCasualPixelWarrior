@@ -81,6 +81,14 @@ class CWaveInfoMenu {
 
         R_DrawString(R_GetDefaultFont(), "Amount of collected coins: " + CVar_GetInt("player_coins", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 40), Color(50, 50, 50, 255));
 
+        R_DrawString(R_GetDefaultFont(), "Defeated enemies: " + CVar_GetInt("enemies_defeated", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 60), Color(50, 50, 50, 255));
+
+        R_DrawString(R_GetDefaultFont(), "Shots fired: " + CVar_GetInt("shots_fired", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 80), Color(50, 50, 50, 255));
+
+        R_DrawString(R_GetDefaultFont(), "Grenades thrown: " + CVar_GetInt("grenades_thrown", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 100), Color(50, 50, 50, 255));
+
+        R_DrawString(R_GetDefaultFont(), "Dodges: " + CVar_GetInt("dodges_count", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 120), Color(50, 50, 50, 255));
+
         Color sColor;
         if (this.MouseInsideCloseText()) {
             sColor = Color(35, 140, 35, 255);
