@@ -34,7 +34,7 @@ class CWorldShop : IScriptedEntity
 
         this.m_hShop = R_LoadSprite(GetPackagePath() + "gfx\\shop.png", 1, 165, 262, 1, false);
 
-		this.m_tmrShowMenuAgain.SetDelay(5000);
+		this.m_tmrShowMenuAgain.SetDelay(1000);
 		this.m_tmrShowMenuAgain.Reset();
 		this.m_tmrShowMenuAgain.SetActive(true);
 
@@ -113,14 +113,13 @@ class CWorldShop : IScriptedEntity
 				}
 			} else {
 				if (this.m_tmrShowMenuAgain.IsElapsed()) {
-					this.m_tmrShowMenuAgain.Reset();
-					
 					if (!CVar_GetBool("show_shop_menu", false)) {
 						CVar_SetBool("show_shop_menu", true);
 					}
 				}
+
+				this.m_tmrShowMenuAgain.Reset();
 			}
-			
         }
 	}
 	
