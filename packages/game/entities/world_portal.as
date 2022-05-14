@@ -44,7 +44,7 @@ class CWorldPortal : IScriptedEntity
         this.m_tmrSpriteChange.Reset();
         this.m_tmrSpriteChange.SetActive(true);
 
-		this.m_tmrShowMenuAgain.SetDelay(5000);
+		this.m_tmrShowMenuAgain.SetDelay(1000);
 		this.m_tmrShowMenuAgain.Reset();
 		this.m_tmrShowMenuAgain.SetActive(true);
 
@@ -133,12 +133,12 @@ class CWorldPortal : IScriptedEntity
 				}
 			} else {
 				if (this.m_tmrShowMenuAgain.IsElapsed()) {
-					this.m_tmrShowMenuAgain.Reset();
-
 					if (!CVar_GetBool("show_mapsel_menu", false)) {
 						CVar_SetBool("show_mapsel_menu", true);
 					}
 				}
+
+				this.m_tmrShowMenuAgain.Reset();
 			}
 			
         }
