@@ -208,7 +208,7 @@ class CShopMenu {
 
                     Color colAffordable = Color(200, 30, 30, 255);
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWeapons[i].iPrice >= 0) {
-                        colAffordable = Color(30, 200, 30, 255);
+                        colAffordable = Color(24, 130, 24, 255);
                     }
 
                     R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWeapons[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
@@ -233,7 +233,7 @@ class CShopMenu {
 
                     Color colAffordable = Color(200, 30, 30, 255);
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemAmmo[i].iPrice >= 0) {
-                        colAffordable = Color(30, 200, 30, 255);
+                        colAffordable = Color(24, 130, 24, 255);
                     }
 
                     R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemAmmo[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
@@ -256,7 +256,7 @@ class CShopMenu {
 
                     Color colAffordable = Color(200, 30, 30, 255);
                     if (HUD_GetCollectableCount("coins") - this.m_arrShopItemWorlds[i].iPrice >= 0) {
-                        colAffordable = Color(30, 200, 30, 255);
+                        colAffordable = Color(24, 130, 24, 255);
                     }
 
                     R_DrawString(R_GetDefaultFont(), "$" + formatInt(this.m_arrShopItemWorlds[i].iPrice), Vector(this.m_vecPos[0] + 10 + iSpacing + 15, this.m_vecPos[1] + 255), colAffordable);
