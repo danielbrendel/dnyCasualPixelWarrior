@@ -65,6 +65,8 @@ class CShopMenu {
         this.AddItem("ammo_pistol_x50", "Pistol x50", "", "handgunhud.png", 50, SHOP_CAT_AMMO);
         this.AddItem("ammo_shotgun_x25", "Shotgun x25", "", "shotgunhud.png", 100, SHOP_CAT_AMMO);
         this.AddItem("ammo_lasergun_x25", "Lasergun x25", "", "lasergunhud.png", 100, SHOP_CAT_AMMO);
+        this.AddItem("ammo_fthrower_x25", "Flamethrower x25", "", "fthrowerhud.png", 250, SHOP_CAT_AMMO);
+        this.AddItem("ammo_plasmagun_x25", "Plasmagun x25", "", "plasmagunhud.png", 250, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x1", "Grenade x1", "", "grenade.png", 100, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x5", "Grenade x5", "", "grenade.png", 350, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x10", "Grenade x10", "", "grenade.png", 500, SHOP_CAT_AMMO);
@@ -438,6 +440,12 @@ class CShopMenu {
                         } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_lasergun_x25") {
                             this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
                             HUD_UpdateAmmoItem("laser", HUD_GetAmmoItemCurrent("laser") + 25, HUD_GetAmmoItemMax("laser"));
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_fthrower_x25") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("fthrower", HUD_GetAmmoItemCurrent("fthrower") + 25, HUD_GetAmmoItemMax("fthrower"));
+                        } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_plasmagun_x25") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("plasma", HUD_GetAmmoItemCurrent("plasma") + 25, HUD_GetAmmoItemMax("plasma"));
                         } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x1") {
                             this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
                             HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 1);
