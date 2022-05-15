@@ -194,6 +194,9 @@ class CShopMenu {
         this.m_iSelectedItem = -1;
 
         if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
+            string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemWeapons.length());
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWeapons.length()) {
                     int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
@@ -219,6 +222,9 @@ class CShopMenu {
         } else if (this.m_iTabSelection == SHOP_CAT_AMMO) {
             R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.ammo.temporary", "Note: Additional ammo is only temporary."), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 123), Color(50, 50, 50, 255));
 
+            string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemAmmo.length());
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemAmmo.length()) {
                     int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
@@ -242,6 +248,9 @@ class CShopMenu {
                 }
             }
         } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
+            string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemWorlds.length());
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWorlds.length()) {
                     int iSpacing = iItemLoop * 10 * SHOP_ITEM_CHARACTER_MAXLEN + 10;
