@@ -463,8 +463,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_oShopMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
 
 			if (GetCurrentMap() == "basis.cfg") {
-				if (CVar_GetBool("basis_hint", false)) {
+				if (CVar_GetBool("basis_hint", true)) {
 					this.m_oInfoMenu.Start();
+					CVar_SetBool("basis_hint", false);
 				}
 			} else {
 				this.m_oInfoMenu.Start();
@@ -1348,7 +1349,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("snowland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
 	CVar_Register("lavaland_unlocked", CVAR_TYPE_BOOL, "0");
-	CVar_Register("basis_hint", CVAR_TYPE_BOOL, "0");
+	CVar_Register("basis_hint", CVAR_TYPE_BOOL, "1");
 	CVar_Register("shop_command", CVAR_TYPE_STRING, "");
 	CVar_Register("ammo_max_pistol", CVAR_TYPE_INT, "0");
 	CVar_Register("ammo_max_shotgun", CVAR_TYPE_INT, "200");
