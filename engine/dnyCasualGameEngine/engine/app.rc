@@ -1,0 +1,4 @@
+#include "resource.h"
+
+ID_APPICON ICON "gfx\\appicon.ico"
+ID_APPICON_SM ICON "gfx\\appicon_sm.ico"
