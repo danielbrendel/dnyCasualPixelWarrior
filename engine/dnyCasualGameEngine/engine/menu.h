@@ -2048,6 +2048,14 @@ namespace Menu {
 				while (!hFile.eof()) {
 					hFile.getline(wszInputBuffer, sizeof(wszInputBuffer), '\n');
 
+					if (std::wstring(wszInputBuffer) == L"0x0") {
+						RECT sWindowRect;
+
+						GetWindowRect(GetDesktopWindow(), &sWindowRect);
+						std::wstring wszDeskRes = std::to_wstring(sWindowRect.right) + L"x" + std::to_wstring(sWindowRect.bottom);
+						wcscpy(wszInputBuffer, wszDeskRes.c_str());
+					}
+
 					this->m_vResolutions.push_back(wszInputBuffer);
 				}
 

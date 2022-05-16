@@ -428,6 +428,15 @@ namespace Game {
 			pConfigMgr->Execute(wszBasePath + L"app.cfg");
 			pConfigMgr->Execute(wszBasePath + L"config.cfg");
 			
+			//Check special resolution vars
+			if ((pGfxResolutionWidth->iValue == 0) && (pGfxResolutionHeight->iValue == 0)) {
+				RECT sWindowRect;
+
+				GetWindowRect(GetDesktopWindow(), &sWindowRect);
+				pGfxResolutionWidth->iValue = sWindowRect.right;
+				pGfxResolutionHeight->iValue = sWindowRect.bottom;
+			}
+
 			//Link with Steam
 
 			if (pAppSteamID->iValue != 0) {
