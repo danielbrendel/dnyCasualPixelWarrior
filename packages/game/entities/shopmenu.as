@@ -401,6 +401,9 @@ class CShopMenu {
                             if (!CVar_GetBool("weapon_laser", false)) {
                                 this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("weapon_laser", true);
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_LASERGUN")) {
+							        Steam_SetAchievement("PURCHASED_LASERGUN");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -408,6 +411,9 @@ class CShopMenu {
                             if (!CVar_GetBool("weapon_shotgun", false)) {
                                 this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("weapon_shotgun", true);
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_SHOTGUN")) {
+							        Steam_SetAchievement("PURCHASED_SHOTGUN");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -415,6 +421,9 @@ class CShopMenu {
                             if (!CVar_GetBool("weapon_fthrower", false)) {
                                 this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("weapon_fthrower", true);
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_FTHROWER")) {
+							        Steam_SetAchievement("PURCHASED_FTHROWER");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -422,6 +431,9 @@ class CShopMenu {
                             if (!CVar_GetBool("weapon_plasma", false)) {
                                 this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("weapon_plasma", true);
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_PLASMAGUN")) {
+							        Steam_SetAchievement("PURCHASED_PLASMAGUN");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -471,6 +483,9 @@ class CShopMenu {
                                 this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("snowland_unlocked", true);
                                 CVar_SetString("shop_command", "unlock:snowland;");
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_SNOWLAND")) {
+							        Steam_SetAchievement("PURCHASED_SNOWLAND");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -479,6 +494,9 @@ class CShopMenu {
                                 this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("wasteland_unlocked", true);
                                 CVar_SetString("shop_command", "unlock:wasteland;");
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_WASTELAND")) {
+							        Steam_SetAchievement("PURCHASED_WASTELAND");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
@@ -487,6 +505,9 @@ class CShopMenu {
                                 this.PerformPurchase(this.m_arrShopItemWorlds[this.m_iSelectedItem].iPrice);
                                 CVar_SetBool("lavaland_unlocked", true);
                                 CVar_SetString("shop_command", "unlock:lavaland;");
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_LAVALAND")) {
+							        Steam_SetAchievement("PURCHASED_LAVALAND");
+						        }
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }

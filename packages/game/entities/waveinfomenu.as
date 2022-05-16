@@ -89,6 +89,18 @@ class CWaveInfoMenu {
 
         R_DrawString(R_GetDefaultFont(), "Dodges: " + CVar_GetInt("dodges_count", 0), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 120), Color(50, 50, 50, 255));
 
+        int iPlayTime = CVar_GetInt("game_playtime", 0);
+        int iPlayTimeHours = iPlayTime / 60 / 60;
+        int iPlayTimeMins = iPlayTime / 60;
+        int iPlayTimeSecs = iPlayTime % 60;
+        string szPlayTimeHours = formatInt(iPlayTimeHours);
+        string szPlayTimeMins = formatInt(iPlayTimeMins);
+        string szPlayTimeSecs = formatInt(iPlayTimeSecs);
+        if (iPlayTimeHours < 10) { szPlayTimeHours = "0" + szPlayTimeHours; }
+        if (iPlayTimeMins < 10) { szPlayTimeMins = "0" + szPlayTimeMins; }
+        if (iPlayTimeSecs < 10) { szPlayTimeSecs = "0" + szPlayTimeSecs; }
+        R_DrawString(R_GetDefaultFont(), "Playtime: " + szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 140), Color(50, 50, 50, 255));
+
         Color sColor;
         if (this.MouseInsideCloseText()) {
             sColor = Color(35, 140, 35, 255);

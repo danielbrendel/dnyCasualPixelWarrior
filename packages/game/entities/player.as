@@ -167,6 +167,9 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	CMapSelectMenu m_oSelectMenu;
 	CWaveInfoMenu m_oWaveInfoMenu;
 	CShopMenu m_oShopMenu;
+	Timer m_tmrEndurance;
+	int m_iEnduranceSecs;
+	bool m_bPlayTimeAchOnce;
 	
 	CPlayerEntity()
     {
@@ -182,8 +185,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
 		this.m_bProcessOnce = false;
+		this.m_iEnduranceSecs = 0;
+		this.m_bPlayTimeAchOnce = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
+		CVar_Register("game_playtime", CVAR_TYPE_INT, "0");
 
 		this.m_oInfoMenu = CInfoMenu();
 		this.m_oSelectMenu = CMapSelectMenu();
@@ -400,7 +406,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrGameCounter.Reset();
 		this.m_tmrGameCounter.SetActive(true);
 		this.m_tmrGoInfo.SetDelay(1500);
+		this.m_tmrEndurance.SetDelay(1000);
+		this.m_tmrEndurance.Reset();
+		this.m_tmrEndurance.SetActive(true);
 		CVar_SetBool("game_started", false);
+		CVar_SetInt("game_playtime", 0);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -440,10 +450,6 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		//First call processings
 		if (!this.m_bProcessOnce) {
 			this.m_bProcessOnce = true;
-
-			/*if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FIRST_START")) {
-				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
-			}*/
 
 			if (GetCurrentMap() == "basis.cfg") {
 				this.LoadBasisDialog();
@@ -499,6 +505,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						this.m_tmrGameCounter.SetActive(false);
 						this.m_tmrGoInfo.Reset();
 						this.m_tmrGoInfo.SetActive(true);
+						this.m_iEnduranceSecs = 0;
 					}
 				}
 			}
@@ -518,6 +525,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (this.m_tmrGoInfo.IsElapsed()) {
 				this.m_tmrGoInfo.SetActive(false);
 				CVar_SetBool("game_started", true);
+			}
+		}
+
+		//Endurance calculation
+		if ((GetCurrentMap() != "basis.cfg") && (!this.m_oWaveInfoMenu.IsActive())) {
+			this.m_tmrEndurance.Update();
+			if (this.m_tmrEndurance.IsElapsed()) {
+				this.m_tmrEndurance.Reset();
+				this.m_iEnduranceSecs++;
+				CVar_SetInt("game_playtime", this.m_iEnduranceSecs);
 			}
 		}
 
@@ -891,6 +908,69 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if (this.m_uiHealth == 0) {
 			this.m_uiButtons = 0;
 			this.m_oWaveInfoMenu.Start();
+
+			if (!this.m_bPlayTimeAchOnce) {
+				this.m_bPlayTimeAchOnce = true;
+
+				int iMins = CVar_GetInt("game_playtime", 0) / 60;
+
+				if ((iMins >= 15) && (iMins < 30)) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_15_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_15_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_15_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_15_LAVALAND");
+						}
+					}
+				} else if ((iMins >= 30) && (iMins < 60)) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_30_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_30_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_30_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_30_LAVALAND");
+						}
+					}
+				} else if (iMins >= 60) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_60_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_60_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_60_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_60_LAVALAND");
+						}
+					}
+				}
+				
+			}
 		}
 
 		//Process shop commands
@@ -989,6 +1069,21 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			R_DrawString(this.m_hGameInfoFont, formatInt(GAME_COUNTER_MAX - this.m_uiGameCounter), Vector(Wnd_GetWindowCenterX() - 10, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
 		} else if (this.m_tmrGoInfo.IsActive()) {
 			R_DrawString(this.m_hGameInfoFont, _("app.go", "GO!"), Vector(Wnd_GetWindowCenterX() - 30, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
+		}
+
+		if (GetCurrentMap() != "basis.cfg") {
+			int iPlayTime = CVar_GetInt("game_playtime", 0);
+			int iPlayTimeHours = iPlayTime / 60 / 60;
+			int iPlayTimeMins = iPlayTime / 60;
+			int iPlayTimeSecs = iPlayTime % 60;
+			string szPlayTimeHours = formatInt(iPlayTimeHours);
+			string szPlayTimeMins = formatInt(iPlayTimeMins);
+			string szPlayTimeSecs = formatInt(iPlayTimeSecs);
+			if (iPlayTimeHours < 10) { szPlayTimeHours = "0" + szPlayTimeHours; }
+			if (iPlayTimeMins < 10) { szPlayTimeMins = "0" + szPlayTimeMins; }
+			if (iPlayTimeSecs < 10) { szPlayTimeSecs = "0" + szPlayTimeSecs; }
+			string szPlayTimeInfo = szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs;
+			R_DrawString(R_GetDefaultFont(), szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs, Vector(Wnd_GetWindowCenterX() - (szPlayTimeInfo.length() * 10 / 2) , Wnd_GetWindowCenterY() * 2 - 20), Color(255, 50, 50, 255));
 		}
 
 		this.m_oInfoMenu.Draw();
