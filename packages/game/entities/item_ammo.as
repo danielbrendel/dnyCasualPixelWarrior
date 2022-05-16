@@ -164,6 +164,11 @@ class CItemAmmoBase : IScriptedEntity
 	{
 		if ((this.m_bActive) && (ref.GetName() == "player")) {
 			ICollectingEntity@ collectingEntity = cast<ICollectingEntity>(ref);
+
+			if (!CVar_GetBool("weapon_temp_" + this.m_szWeapon, false)) {
+				CVar_SetBool("weapon_temp_" + this.m_szWeapon, true);
+			}
+
 			collectingEntity.AddAmmo(this.m_szWeapon, this.m_uiSupplyCount);
 			
 			this.m_bActive = false;

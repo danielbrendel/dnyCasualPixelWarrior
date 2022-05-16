@@ -5,7 +5,7 @@ mainmenu.play:Spielen
 mainmenu.mods:Modifikationen
 mainmenu.settings:Einstellungen
 mainmenu.quit:Beenden
-playmenu.btnplay:Neues Spiel
+playmenu.btnplay:Spielen!
 playmenu.btnload:Spiel laden
 playmenu.btndelete:Löschen
 playmenu.savedgames:Gespeicherte Spiele

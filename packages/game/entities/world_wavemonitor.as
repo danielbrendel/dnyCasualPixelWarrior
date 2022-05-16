@@ -67,7 +67,7 @@ class CWaveMonitor : IScriptedEntity
 	bool HandleCoinAchievements()
 	{
 		if (Ent_GetEntityNameCount("item_coin") == 0) {
-			if (GetCurrentMap() == "greenland.cfg") {
+			/*if (GetCurrentMap() == "greenland.cfg") {
 				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_GREENLAND")) {
 					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_GREENLAND");
 				}
@@ -83,7 +83,7 @@ class CWaveMonitor : IScriptedEntity
 				if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_COLLECT_COINS_BOSSFIGHT")) {
 					Steam_SetAchievement("ACHIEVEMENT_COLLECT_COINS_BOSSFIGHT");
 				}
-			}
+			}*/
 
 			return true;
 		}

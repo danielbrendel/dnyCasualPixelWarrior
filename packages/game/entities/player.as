@@ -14,11 +14,16 @@
 string g_szPackagePath = "";
 
 #include "weapon_laser.as"
+#include "weapon_laserball.as"
+#include "weapon_flame.as"
 #include "weapon_gun.as"
 #include "weapon_grenade.as"
 #include "explosion.as"
 #include "tankcls.as"
 #include "infomenu.as"
+#include "mapselectmenu.as"
+#include "waveinfomenu.as"
+#include "shopmenu.as"
 
 /* Player animation manager */
 class CPlayerAnimation {
@@ -109,6 +114,8 @@ const int BTN_DODGE = (1 << 9);
 const int WEAPON_HANDGUN = 1;
 const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
+const int WEAPON_FTHROWER = 4;
+const int WEAPON_PLASMAGUN = 5;
 const uint GAME_COUNTER_MAX = 5;
 /* Player entity manager */
 class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
@@ -157,7 +164,12 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	bool m_bProcessOnce;
 	CInfoMenu m_oInfoMenu;
 	SpriteHandle m_hCursor;
-	bool m_bBossDefeatedDlgOpen;
+	CMapSelectMenu m_oSelectMenu;
+	CWaveInfoMenu m_oWaveInfoMenu;
+	CShopMenu m_oShopMenu;
+	Timer m_tmrEndurance;
+	int m_iEnduranceSecs;
+	bool m_bPlayTimeAchOnce;
 	
 	CPlayerEntity()
     {
@@ -173,68 +185,94 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_vecCrosshair = Vector(32, 32);
 		this.m_uiDodgeCounter = 0;
 		this.m_bProcessOnce = false;
-		this.m_bBossDefeatedDlgOpen = false;
+		this.m_iEnduranceSecs = 0;
+		this.m_bPlayTimeAchOnce = false;
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
-		CVar_Register("game_completed", CVAR_TYPE_BOOL, "0");
+		CVar_Register("game_playtime", CVAR_TYPE_INT, "0");
 
 		this.m_oInfoMenu = CInfoMenu();
+		this.m_oSelectMenu = CMapSelectMenu();
+		this.m_oWaveInfoMenu = CWaveInfoMenu();
+		this.m_oShopMenu = CShopMenu();
     }
 
-	//Load greenland dialog
-	void LoadGreenlandDialog()
+	//Load basis dialog
+	void LoadBasisDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("Okay, so the portal has actually worked!");
+		dialog1.insertLast("Welcome soldier!");
 		dialog1.insertLast("");
-		dialog1.insertLast("After they destroyed our beloved planet,");
-		dialog1.insertLast("we finally managed to go through the portal to our enemies planet");
+		dialog1.insertLast("I am VAD, your personal virtual assistance device!");
 		dialog1.insertLast("");
-		dialog1.insertLast("We need to find their leader who controls their mission");
-		dialog1.insertLast("in order to defeat them to save the survivors of their attack.");
-
+		dialog1.insertLast("This is your basis. Here you can travel to far distanced");
+		dialog1.insertLast("worlds to earn coins by defeating waves of enemies.");
+		dialog1.insertLast("");
+		dialog1.insertLast("With these earned coins you can buy upgrades via the shop.");
+		dialog1.insertLast("");
+		
 		array<string> dialog2;
-		dialog2.insertLast("But before we get to the enemies boss, we surely");
-		dialog2.insertLast("have to make our way through their minions.");
-		dialog2.insertLast("");
-		dialog2.insertLast("I sense that the enemy has previously captured a lot of planets,");
-		dialog2.insertLast("so we will face many of their slaves who now fight for the enemy boss.");
+		dialog2.insertLast("The mission you have is endless: Earn more and more coins,");
+		dialog2.insertLast("and invest them in upgrades. The better upgrades you have,");
+		dialog2.insertLast("the longer you will last in the waves of enemies.");
 
 		array<string> dialog3;
-		dialog3.insertLast("In order to proceed to the next chapter, make sure");
-		dialog3.insertLast("you defeat all of their waves spawned against you.");
+		dialog3.insertLast("The tower on the left is your shop.");
 		dialog3.insertLast("");
-		dialog3.insertLast("After finishing each enemy wave, a portal will show up");
-		dialog3.insertLast("where you can escape to the next chapter.");
+		dialog3.insertLast("Use it with your earned coins to buy upgrades.");
+		dialog3.insertLast("");
+		dialog3.insertLast("Upgrades consist of weapons, ammo and unlocking new worlds.");
 
 		array<string> dialog4;
-		dialog4.insertLast("You are equipped with three different weapons");
-		dialog4.insertLast("plus you also got some grenades.");
+		dialog4.insertLast("The portal on the right is your way to travel to other worlds.");
 		dialog4.insertLast("");
-		dialog4.insertLast("Pay attention to the various items on each level");
-		dialog4.insertLast("which supply you with more ammunition or health.");
-
-		array<string> dialog5;
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("");
-		dialog5.insertLast("Now it is up to you!");
-		dialog5.insertLast("Good luck, soldier!");
+		dialog4.insertLast("In these worlds you will fight endless waves of enemies.");
+		dialog4.insertLast("These enemies will drop coins which you then can invest");
+		dialog4.insertLast("in new upgrades!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 		this.m_oInfoMenu.AddDialog(dialog3);
 		this.m_oInfoMenu.AddDialog(dialog4);
-		this.m_oInfoMenu.AddDialog(dialog5);
+	}
+
+	//Load greenland dialog
+	void LoadGreenlandDialog()
+	{
+		array<string> dialog1;
+		dialog1.insertLast("These realms are the so called greenlands.");
+		dialog1.insertLast("");
+		dialog1.insertLast("It is a fruitful land, with various bioms.");
+		dialog1.insertLast("Altough it is currently occupied by a military force.");
+		dialog1.insertLast("");
+		dialog1.insertLast("You can surely gather some coins from them,");
+		dialog1.insertLast("but don't forget to evade their attacks.");
+
+		array<string> dialog2;
+		dialog2.insertLast("The military force who has occupied this land");
+		dialog2.insertLast("likes to have military from different centuries.");
+		dialog2.insertLast("");
+		dialog2.insertLast("That's why you will meet ballistas, tanks and laser mechs.");
+		dialog2.insertLast("And also they seem to have some tesla towers in place.");
+
+		array<string> dialog3;
+		dialog3.insertLast("So, good luck, soldier.");
+		dialog3.insertLast("");
+		dialog3.insertLast("And don't worry! If you get fragged you will be");
+		dialog3.insertLast("resurrected at your basis!");
+
+		this.m_oInfoMenu.AddDialog(dialog1);
+		this.m_oInfoMenu.AddDialog(dialog2);
+		this.m_oInfoMenu.AddDialog(dialog3);
 	}
 
 	//Load snowland dialog
 	void LoadSnowlandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("This time we have to deal with some monsters who now");
-		dialog1.insertLast("work for the enemy.");
+		dialog1.insertLast("Welcome to the snowlands!");
+		dialog1.insertLast("");
+		dialog1.insertLast("It's very cold here, brrr. I hope you are wearing warm clothes!");
 		dialog1.insertLast("");
 		dialog1.insertLast("It's fascinating what diverse species are out there in the universe.");
 		dialog1.insertLast("Tho fascinating and definitely beautiful, these monsters will not");
@@ -242,15 +280,13 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		dialog1.insertLast("against them.");
 
 		array<string> dialog2;
-		dialog2.insertLast("You can use dodging to evade the monsters attacks,");
-		dialog2.insertLast("but beware that some of them have direct impact when attacking.");
+		dialog2.insertLast("There were some people who wanted to tame these monsters");
+		dialog2.insertLast("and keep them as pets. Guess how much luck they had...");
 		dialog2.insertLast("");
-		dialog2.insertLast("So, keep an eye open for health items, which you may need when");
-		dialog2.insertLast("dealing with them.");
+		dialog2.insertLast("So, don't underestimate their power and beware that some are");
+		dialog2.insertLast("close and some are far range attacking monsters.");
 
 		array<string> dialog3;
-		dialog3.insertLast("I'll get back to you, when we have reached the next level.");
-		dialog3.insertLast("");
 		dialog3.insertLast("Good luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
@@ -262,90 +298,52 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	void LoadWastelandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("We are so close to the enemy boss!");
+		dialog1.insertLast("The wastelands! Another realm that is occupied by another");
+		dialog1.insertLast("military force.");
 		dialog1.insertLast("");
-		dialog1.insertLast("We just have to defeat its private army before we can reach it.");
-		dialog1.insertLast("These are not slaves from other planets. These are specifically bred");
-		dialog1.insertLast("for only one reason: Defeat all intruders who want to come too close to");
-		dialog1.insertLast("the boss!");
+		dialog1.insertLast("These guys have caused so much trouble in the universe,");
+		dialog1.insertLast("so that we surely can grab some coins from them, you know...");
 
 		array<string> dialog2;
-		dialog2.insertLast("So, ready your weaponry and show them what we can do.");
+		dialog2.insertLast("I hope you have enough weaponry equipped, because these");
+		dialog2.insertLast("guys do serious business.");
+		dialog2.insertLast("So be sure to avoid their attacks as much as possible!");
 		dialog2.insertLast("");
-		dialog2.insertLast("I am certain you will manage to defeat them, so we can travel");
-		dialog2.insertLast("to the enemy boss via the next portal.");
-		dialog2.insertLast("");
-		dialog2.insertLast("I count on you... Good luck, soldier!");
+		dialog2.insertLast("Best of luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 	}
 
-	//Load bossfight dialog
-	void LoadBossfightDialog()
+	//Load lavaland dialog
+	void LoadLavalandDialog()
 	{
 		array<string> dialog1;
-		dialog1.insertLast("Finally... after all this time...");
+		dialog1.insertLast("The lavalands - an unpleasant environment.");
 		dialog1.insertLast("");
-		dialog1.insertLast("WE HAVE REACHED THE BOSS!");
+		dialog1.insertLast("There is not much lifeform here, except one species:");
 		dialog1.insertLast("");
-		dialog1.insertLast("The one who is responsible for all that evil who struck our planet.");
-		dialog1.insertLast("It's time to show the boss its place. This was the last time it");
-		dialog1.insertLast("tried to enlarge its reign of tyranny.");
+		dialog1.insertLast("The aliens! They have occupied these lands and use it");
+		dialog1.insertLast("to build their motherships.");
 
 		array<string> dialog2;
-		dialog2.insertLast("However the boss will surely not give up defenseless.");
+		dialog2.insertLast("These aliens are actually very rich, so we can");
+		dialog2.insertLast("get maaaaaany coins from them.");
 		dialog2.insertLast("");
-		dialog2.insertLast("I can sense that it is armed with heavy weaponry.");
-		dialog2.insertLast("");
-		dialog2.insertLast("Please keep your distance, use your dodging and also stay away");
-		dialog2.insertLast("from its direct impact weapons.");
+		dialog2.insertLast("But beware! They are really strong and heavily armed.");
+		dialog2.insertLast("You will need to have a very good equippment to last");
+		dialog2.insertLast("long enough to earn a sufficient amount of coins.");
 
 		array<string> dialog3;
-		dialog3.insertLast("I know you can defeat it. ");
+		dialog3.insertLast("I hope you got some nice equippment from the shop.");
 		dialog3.insertLast("");
 		dialog3.insertLast("");
 		dialog3.insertLast("");
-		dialog3.insertLast("Good luck, soldier!");
+		dialog3.insertLast("Best of luck, soldier!");
 
 		this.m_oInfoMenu.AddDialog(dialog1);
 		this.m_oInfoMenu.AddDialog(dialog2);
 		this.m_oInfoMenu.AddDialog(dialog3);
-	}
-
-	//Load boss defeated dialog
-	void LoadBossDefeatedDialog()
-	{
-		this.m_oInfoMenu.Clear();
-
-		array<string> dialog1;
-		dialog1.insertLast("I can't believe it, but...!");
-		dialog1.insertLast("");
-		dialog1.insertLast("WE ARE VICTORIOUS!");
-		dialog1.insertLast("");
-		dialog1.insertLast("We have defeated the boss and its minions and thus the invasion is over.");
-		dialog1.insertLast("It was a wild and uncertain ride, but we finally won the battle of our lifes.");
-
-		array<string> dialog2;
-		dialog2.insertLast("Now we need to focus on rebuilding our civilization.");
-		dialog2.insertLast("");
-		dialog2.insertLast("This won't be easy, but I am sure we will manage that");
-		dialog2.insertLast("task, too. Well, as long as we all stand together.");
-		dialog2.insertLast("");
-		dialog2.insertLast("However, this is a different story.");
-		dialog2.insertLast("You can now travel back to earth using the portal.");
-
-		array<string> dialog3;
-		dialog3.insertLast("");
-		dialog3.insertLast("I just hope that we are safe from further invasions now...");
-
-		this.m_oInfoMenu.AddDialog(dialog1);
-		this.m_oInfoMenu.AddDialog(dialog2);
-		this.m_oInfoMenu.AddDialog(dialog3);
-
-		this.m_oInfoMenu.Start();
-
-		this.m_bBossDefeatedDlgOpen = true;
 	}
 	
 	//Aim at screen view position
@@ -408,7 +406,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrGameCounter.Reset();
 		this.m_tmrGameCounter.SetActive(true);
 		this.m_tmrGoInfo.SetDelay(1500);
+		this.m_tmrEndurance.SetDelay(1000);
+		this.m_tmrEndurance.Reset();
+		this.m_tmrEndurance.SetActive(true);
 		CVar_SetBool("game_started", false);
+		CVar_SetInt("game_playtime", 0);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -420,6 +422,26 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called when the entity gets released
 	void OnRelease()
 	{
+		int coins = HUD_GetCollectableCount("coins");
+		int basisHint = (CVar_GetBool("basis_hint", false)) ? 1 : 0;
+		int snowlandUnlocked = (CVar_GetBool("snowland_unlocked", false)) ? 1 : 0;
+		int wastelandUnlocked = (CVar_GetBool("wasteland_unlocked", false)) ? 1 : 0;
+		int lavalandUnlocked = (CVar_GetBool("lavaland_unlocked", false)) ? 1 : 0;
+		int shotgunUnlocked = (CVar_GetBool("weapon_shotgun", false)) ? 1 : 0;
+		int lasergunUnlocked = (CVar_GetBool("weapon_laser", false)) ? 1 : 0;
+		int fthrowerUnlocked = (CVar_GetBool("weapon_fthrower", false)) ? 1 : 0;
+		int plasmagunUnlocked = (CVar_GetBool("weapon_plasma", false)) ? 1 : 0;
+
+		Props_SaveToFile("coins:" + formatInt(coins) + ";" + 
+			"basishint:" + formatInt(basisHint) + ";" + 
+			"snowland:" + formatInt(snowlandUnlocked) + ";" + 
+			"wasteland:" + formatInt(wastelandUnlocked) + ";" + 
+			"lavaland:" + formatInt(lavalandUnlocked) + ";" +
+			"lasergun:" + formatInt(lasergunUnlocked) + ";" +
+			"shotgun:" + formatInt(shotgunUnlocked) + ";" +
+			"fthrower:" + formatInt(fthrowerUnlocked) + ";" +
+			"plasmagun:" + formatInt(plasmagunUnlocked) + ";"
+		, "player.props");
 	}
 	
 	//Process entity stuff
@@ -429,34 +451,48 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if (!this.m_bProcessOnce) {
 			this.m_bProcessOnce = true;
 
-			if (!Steam_IsAchievementUnlocked("ACHIEVEMENT_FIRST_START")) {
-				Steam_SetAchievement("ACHIEVEMENT_FIRST_START");
-			}
-
-			if (GetCurrentMap() == "greenland.cfg") {
+			if (GetCurrentMap() == "basis.cfg") {
+				this.LoadBasisDialog();
+			} else if (GetCurrentMap() == "greenland.cfg") {
 				this.LoadGreenlandDialog();
 			} else if (GetCurrentMap() == "snowland.cfg") {
 				this.LoadSnowlandDialog();
 			} else if (GetCurrentMap() == "wasteland.cfg") {
 				this.LoadWastelandDialog();
-			} else if (GetCurrentMap() == "bossfight.cfg") {
-				this.LoadBossfightDialog();
-				HUD_UpdateCollectable("grenade", 3);
+			} else if (GetCurrentMap() == "lavaland.cfg") {
+				this.LoadLavalandDialog();
 			}
 
 			this.m_oInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
-			this.m_oInfoMenu.Start();
+			this.m_oSelectMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+			this.m_oWaveInfoMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+			this.m_oShopMenu.SetPosition(Vector(Wnd_GetWindowCenterX() - 250, Wnd_GetWindowCenterY() - 250));
+
+			if (GetCurrentMap() == "basis.cfg") {
+				if (CVar_GetBool("basis_hint", true)) {
+					this.m_oInfoMenu.Start();
+					CVar_SetBool("basis_hint", false);
+				}
+			} else {
+				this.m_oInfoMenu.Start();
+			}
+			
+			if (GetCurrentMap() == "basis.cfg") {
+				this.m_oSelectMenu.AddMap("greenland", "Green meadow lands", true);
+				this.m_oSelectMenu.AddMap("snowland", "The snowy frozen neverlands", CVar_GetBool("snowland_unlocked", false));
+				this.m_oSelectMenu.AddMap("wasteland", "The intoxicated wastelands", CVar_GetBool("wasteland_unlocked", false));
+				this.m_oSelectMenu.AddMap("lavaland", "A very unpleasant environment", CVar_GetBool("lavaland_unlocked", false));
+
+				this.m_uiGameCounter = GAME_COUNTER_MAX;
+				this.m_tmrGameCounter.SetActive(false);
+				this.m_tmrGoInfo.SetActive(false);
+			}
 
 			if (GetCurrentMap() == "snowland.cfg") {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair_red.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			} else {
 				this.m_hCrosshair = R_LoadSprite(GetPackagePath() + "gfx\\crosshair.png", 1, this.m_vecCrosshair[0], this.m_vecCrosshair[1], 1, false);
 			}
-		}
-
-		//Process check for bot defeated case
-		if ((CVar_GetBool("game_completed", false)) && (!this.m_bBossDefeatedDlgOpen)) {
-			this.LoadBossDefeatedDialog();
 		}
 
 		//Process game counter
@@ -469,12 +505,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						this.m_tmrGameCounter.SetActive(false);
 						this.m_tmrGoInfo.Reset();
 						this.m_tmrGoInfo.SetActive(true);
+						this.m_iEnduranceSecs = 0;
 					}
 				}
 			}
 		}
 
 		this.m_oInfoMenu.Process();
+		this.m_oSelectMenu.Process();
+		this.m_oWaveInfoMenu.Process();
+		this.m_oShopMenu.Process();
 
 		if (this.m_uiGameCounter < GAME_COUNTER_MAX) {
 			return;
@@ -485,6 +525,16 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (this.m_tmrGoInfo.IsElapsed()) {
 				this.m_tmrGoInfo.SetActive(false);
 				CVar_SetBool("game_started", true);
+			}
+		}
+
+		//Endurance calculation
+		if ((GetCurrentMap() != "basis.cfg") && (!this.m_oWaveInfoMenu.IsActive())) {
+			this.m_tmrEndurance.Update();
+			if (this.m_tmrEndurance.IsElapsed()) {
+				this.m_tmrEndurance.Reset();
+				this.m_iEnduranceSecs++;
+				CVar_SetInt("game_playtime", this.m_iEnduranceSecs);
 			}
 		}
 
@@ -556,7 +606,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		HUD_UpdateHealth(this.m_uiHealth);
 
 		//Process attacking
-		if ((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) {
+		if (((this.m_uiButtons & BTN_ATTACK) == BTN_ATTACK) && (GetCurrentMap() != "basis.cfg")) {
 			this.m_bShooting = true;
 			this.m_tmrAttack.Update();
 			if (this.m_tmrAttack.IsElapsed()) {
@@ -584,6 +634,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					} else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -601,6 +653,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					}  else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
@@ -631,7 +685,59 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 						this.m_tmrShowFlare.Reset();
 						this.m_tmrShowFlare.SetActive(true);
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
 					} else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}
+				} else if (this.m_iCurrentWeapon == WEAPON_FTHROWER) {
+					if (HUD_GetAmmoItemCurrent("fthrower") > 0) {
+						CFlameEntity @flame = CFlameEntity();
+
+						flame.SetDirection(this.GetRotation());
+						flame.SetOwner(@this);
+						
+						Ent_SpawnEntity("weapon_flame", @flame, vecBulletPos);
+						
+						HUD_UpdateAmmoItem("fthrower", HUD_GetAmmoItemCurrent("fthrower") - 1, HUD_GetAmmoItemMax("fthrower"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\flame_shot.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
+					}  else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}
+				} else if (this.m_iCurrentWeapon == WEAPON_PLASMAGUN) {
+					if (HUD_GetAmmoItemCurrent("plasma") > 0) {
+						for (int i = 0; i < 3; i++) {
+							CLaserBallEntity@ ball = CLaserBallEntity();
+
+							float fBallRot = this.GetRotation();
+											
+							if (i == 0) {
+								fBallRot -= 0.2;
+							} else if (i == 2) {
+								fBallRot += 0.2;
+							}
+
+							ball.SetRotation(fBallRot);
+							ball.SetOwner(@this);
+
+							Vector vecBulletPos = Vector(this.m_vecPos[0], this.m_vecPos[1]);
+
+							Ent_SpawnEntity("weapon_laserball", ball, vecBulletPos);
+						}
+						
+						HUD_UpdateAmmoItem("plasma", HUD_GetAmmoItemCurrent("plasma") - 1, HUD_GetAmmoItemMax("plasma"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\laser.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
+					}  else {
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
@@ -652,6 +758,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 					Ent_SpawnEntity("weapon_grenade", @grenade, this.m_vecPos);
 					
 					HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") - 1);
+
+					CVar_SetInt("grenades_thrown", CVar_GetInt("grenades_thrown", 0) + 1);
 				}
 			}
 		}
@@ -708,6 +816,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				if (this.m_uiDodgeCounter >= 5) {
 					this.m_tmrDodging.SetActive(false);
 					this.m_uiDodgeCounter = 0;
+					CVar_SetInt("dodges_count", CVar_GetInt("dodges_count", 0) + 1);
 				}
 			}
 		}
@@ -743,7 +852,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		if (this.m_bShooting) {
 			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
 				this.m_animShootHandgun.Process();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animShootRifle.Process();
 			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
 				this.m_animShootShotgun.Process();
@@ -751,7 +860,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		} else if (this.m_bMoving) {
 			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
 				this.m_animMoveHandgun.Process();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animMoveRifle.Process();
 			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
 				this.m_animMoveShotgun.Process();
@@ -759,7 +868,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		} else {
 			if (this.m_iCurrentWeapon == WEAPON_HANDGUN) {
 				this.m_animIdleHandgun.Process();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animIdleRifle.Process();
 			} else if (this.m_iCurrentWeapon == WEAPON_SHOTGUN) {
 				this.m_animIdleShotgun.Process();
@@ -772,6 +881,107 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (this.m_tmrShowFlare.IsElapsed()) {
 				this.m_tmrShowFlare.SetActive(false);
 			}
+		}
+
+		//Map selection menu
+		if (CVar_GetBool("show_mapsel_menu", false)) {
+			this.m_oSelectMenu.Start();
+			CVar_SetBool("show_mapsel_menu", false);
+			this.m_uiButtons = 0;
+		}
+
+		//Shop menu
+		if (CVar_GetBool("show_shop_menu", false)) {
+			this.m_oShopMenu.Start();
+			CVar_SetBool("show_shop_menu", false);
+			this.m_uiButtons = 0;
+		}
+
+		//Enter world if requested
+		string szShallLoadMap = CVar_GetString("mapsel_enter_world", "");
+		if (szShallLoadMap != "") {
+			CVar_SetString("mapsel_enter_world", "");
+			LoadMap(szShallLoadMap);
+		}
+
+		//Show wave info menu
+		if (this.m_uiHealth == 0) {
+			this.m_uiButtons = 0;
+			this.m_oWaveInfoMenu.Start();
+
+			if (!this.m_bPlayTimeAchOnce) {
+				this.m_bPlayTimeAchOnce = true;
+
+				int iMins = CVar_GetInt("game_playtime", 0) / 60;
+
+				if ((iMins >= 15) && (iMins < 30)) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_15_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_15_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_15_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_15_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_15_LAVALAND");
+						}
+					}
+				} else if ((iMins >= 30) && (iMins < 60)) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_30_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_30_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_30_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_30_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_30_LAVALAND");
+						}
+					}
+				} else if (iMins >= 60) {
+					if (GetCurrentMap() == "greenland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_GREENLAND")) {
+							Steam_SetAchievement("ENDURED_60_GREENLAND");
+						}
+					} else if (GetCurrentMap() == "snowland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_SNOWLAND")) {
+							Steam_SetAchievement("ENDURED_60_SNOWLAND");
+						}
+					} else if (GetCurrentMap() == "wasteland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_WASTELAND")) {
+							Steam_SetAchievement("ENDURED_60_WASTELAND");
+						}
+					} else if (GetCurrentMap() == "lavaland.cfg") {
+						if (!Steam_IsAchievementUnlocked("ENDURED_60_LAVALAND")) {
+							Steam_SetAchievement("ENDURED_60_LAVALAND");
+						}
+					}
+				}
+				
+			}
+		}
+
+		//Process shop commands
+		string szShopCmd = CVar_GetString("shop_command", "");
+		if (szShopCmd.length() > 0) {
+			string szUnlock = Props_ExtractValue(szShopCmd, "unlock");
+			if (szUnlock.length() > 0) {
+				this.m_oSelectMenu.UnlockMap(szUnlock);
+			}
+
+			CVar_SetString("shop_command", "");
 		}
 	}
 	
@@ -797,7 +1007,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animShootHandgun.SetRotation(this.m_fRotation);
 				this.m_animShootHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animShootHandgun.Draw();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animShootRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animShootRifle.SetRotation(this.m_fRotation);
 				this.m_animShootRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -814,7 +1024,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animMoveHandgun.SetRotation(this.m_fRotation);
 				this.m_animMoveHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animMoveHandgun.Draw();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animMoveRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animMoveRifle.SetRotation(this.m_fRotation);
 				this.m_animMoveRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -831,7 +1041,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animIdleHandgun.SetRotation(this.m_fRotation);
 				this.m_animIdleHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animIdleHandgun.Draw();
-			} else if (this.m_iCurrentWeapon == WEAPON_RIFLE) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
 				this.m_animIdleRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animIdleRifle.SetRotation(this.m_fRotation);
 				this.m_animIdleRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -861,9 +1071,27 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			R_DrawString(this.m_hGameInfoFont, _("app.go", "GO!"), Vector(Wnd_GetWindowCenterX() - 30, Wnd_GetWindowCenterY() - 100), Color(100, 0, 0, 255));
 		}
 
-		this.m_oInfoMenu.Draw();
+		if (GetCurrentMap() != "basis.cfg") {
+			int iPlayTime = CVar_GetInt("game_playtime", 0);
+			int iPlayTimeHours = iPlayTime / 60 / 60;
+			int iPlayTimeMins = iPlayTime / 60;
+			int iPlayTimeSecs = iPlayTime % 60;
+			string szPlayTimeHours = formatInt(iPlayTimeHours);
+			string szPlayTimeMins = formatInt(iPlayTimeMins);
+			string szPlayTimeSecs = formatInt(iPlayTimeSecs);
+			if (iPlayTimeHours < 10) { szPlayTimeHours = "0" + szPlayTimeHours; }
+			if (iPlayTimeMins < 10) { szPlayTimeMins = "0" + szPlayTimeMins; }
+			if (iPlayTimeSecs < 10) { szPlayTimeSecs = "0" + szPlayTimeSecs; }
+			string szPlayTimeInfo = szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs;
+			R_DrawString(R_GetDefaultFont(), szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs, Vector(Wnd_GetWindowCenterX() - (szPlayTimeInfo.length() * 10 / 2) , Wnd_GetWindowCenterY() * 2 - 20), Color(255, 50, 50, 255));
+		}
 
-		if (this.m_oInfoMenu.IsActive()) {
+		this.m_oInfoMenu.Draw();
+		this.m_oSelectMenu.Draw();
+		this.m_oWaveInfoMenu.Draw();
+		this.m_oShopMenu.Draw();
+
+		if ((this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			R_DrawSprite(this.m_hCursor, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 		} else {
 			R_DrawSprite(this.m_hCrosshair, Vector(this.m_vecCursorPos[0] - this.m_vecCrosshair[0] / 2, this.m_vecCursorPos[1] - this.m_vecCrosshair[1] / 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
@@ -873,7 +1101,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Indicate whether this entity shall be removed by the game
 	bool NeedsRemoval()
 	{
-		return this.m_uiHealth == 0;
+		return false;
 	}
 	
 	//Indicate if entity can be dormant
@@ -973,7 +1201,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	//Called for key presses
 	void OnKeyPress(int vKey, bool bDown)
 	{
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive())) {
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oSelectMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			return;
 		}
 		
@@ -1071,11 +1299,25 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			this.m_iCurrentWeapon = WEAPON_HANDGUN;
 			HUD_SetAmmoDisplayItem("handgun");
 		} else if (vKey == GetKeyBinding("SLOT2")) {
-			this.m_iCurrentWeapon = WEAPON_RIFLE;
-			HUD_SetAmmoDisplayItem("laser");
+			if ((CVar_GetBool("weapon_laser", false)) || (CVar_GetBool("weapon_temp_laser", false))) {
+				this.m_iCurrentWeapon = WEAPON_RIFLE;
+				HUD_SetAmmoDisplayItem("laser");
+			}
 		} else if (vKey == GetKeyBinding("SLOT3")) {
-			this.m_iCurrentWeapon = WEAPON_SHOTGUN;
-			HUD_SetAmmoDisplayItem("shotgun");
+			if ((CVar_GetBool("weapon_shotgun", false)) || (CVar_GetBool("weapon_temp_shotgun", false))) {
+				this.m_iCurrentWeapon = WEAPON_SHOTGUN;
+				HUD_SetAmmoDisplayItem("shotgun");
+			}
+		} else if (vKey == GetKeyBinding("SLOT4")) {
+			if ((CVar_GetBool("weapon_fthrower", false)) || (CVar_GetBool("weapon_temp_fthrower", false))) {
+				this.m_iCurrentWeapon = WEAPON_FTHROWER;
+				HUD_SetAmmoDisplayItem("fthrower");
+			}
+		} else if (vKey == GetKeyBinding("SLOT5")) {
+			if ((CVar_GetBool("weapon_plasma", false)) || (CVar_GetBool("weapon_temp_plasma", false))) {
+				this.m_iCurrentWeapon = WEAPON_PLASMAGUN;
+				HUD_SetAmmoDisplayItem("plasma");
+			}
 		}
 	}
 	
@@ -1088,7 +1330,25 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			}
 		}
 
-		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive())) {
+		if (this.m_oSelectMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oSelectMenu.OnMouseClick();
+			}
+		}
+
+		if (this.m_oWaveInfoMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oWaveInfoMenu.OnMouseClick();
+			}
+		}
+
+		if (this.m_oShopMenu.IsActive()) {
+			if ((key == 1) && (!bDown)) {
+				this.m_oShopMenu.OnMouseClick();
+			}
+		}
+
+		if ((this.m_tmrGameCounter.IsActive()) || (this.m_oInfoMenu.IsActive()) || (this.m_oWaveInfoMenu.IsActive()) || (this.m_oShopMenu.IsActive())) {
 			return;
 		}
 
@@ -1116,6 +1376,15 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		//Inform info menu
 		this.m_oInfoMenu.OnUpdateCursorPos(pos);
+
+		//Inform selection menu
+		this.m_oSelectMenu.OnUpdateCursorPos(pos);
+
+		//Inform wave info menu
+		this.m_oWaveInfoMenu.OnUpdateCursorPos(pos);
+
+		//Inform shop menu
+		this.m_oShopMenu.OnUpdateCursorPos(pos);	
 	}
 	
 	//Return save game properties
@@ -1167,26 +1436,85 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	g_szPackagePath = szPath;
 	
 	Ent_SetGoalActivationStatus(false);
-	
+
+	CVar_Register("show_mapsel_menu", CVAR_TYPE_BOOL, "0");
+	CVar_Register("mapsel_enter_world", CVAR_TYPE_STRING, "");
+	CVar_Register("show_shop_menu", CVAR_TYPE_BOOL, "0");
+	CVar_Register("player_coins", CVAR_TYPE_INT, "0");
+	CVar_Register("snowland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("wasteland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("lavaland_unlocked", CVAR_TYPE_BOOL, "0");
+	CVar_Register("basis_hint", CVAR_TYPE_BOOL, "1");
+	CVar_Register("shop_command", CVAR_TYPE_STRING, "");
+	CVar_Register("ammo_max_pistol", CVAR_TYPE_INT, "0");
+	CVar_Register("ammo_max_shotgun", CVAR_TYPE_INT, "200");
+	CVar_Register("ammo_max_lasergun", CVAR_TYPE_INT, "200");
+	CVar_Register("ammo_max_fthrower", CVAR_TYPE_INT, "100");
+	CVar_Register("ammo_max_plasmagun", CVAR_TYPE_INT, "100");
+	CVar_Register("weapon_laser", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_shotgun", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_fthrower", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_plasma", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_laser", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_shotgun", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_fthrower", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_plasma", CVAR_TYPE_BOOL, "0");
+	CVar_Register("enemies_defeated", CVAR_TYPE_INT, "0");
+	CVar_Register("shots_fired", CVAR_TYPE_INT, "0");
+	CVar_Register("grenades_thrown", CVAR_TYPE_INT, "0");
+	CVar_Register("dodges_count", CVAR_TYPE_INT, "0");
+
+	CVar_SetString("mapsel_enter_world", "");
+
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
-	
+
+	string props = Props_GetFromFile("player.props");
+	int coins = parseInt(Props_ExtractValue(props, "coins"));
+	int snowlandUnlocked = parseInt(Props_ExtractValue(props, "snowland"));
+	int wastelandUnlocked = parseInt(Props_ExtractValue(props, "wasteland"));
+	int lavalandUnlocked = parseInt(Props_ExtractValue(props, "lavaland"));
+	int basisHint = parseInt(Props_ExtractValue(props, "basishint"));
+	int lasergun = parseInt(Props_ExtractValue(props, "lasergun"));
+	int shotgun = parseInt(Props_ExtractValue(props, "shotgun"));
+	int fthrower = parseInt(Props_ExtractValue(props, "fthrower"));
+	int plasmagun = parseInt(Props_ExtractValue(props, "plasmagun"));
+
+	CVar_SetBool("snowland_unlocked", snowlandUnlocked > 0);
+	CVar_SetBool("wasteland_unlocked", wastelandUnlocked > 0);
+	CVar_SetBool("lavaland_unlocked", lavalandUnlocked > 0);
+	CVar_SetBool("basis_hint", basisHint > 0);
+	CVar_SetBool("weapon_laser", lasergun > 0);
+	CVar_SetBool("weapon_shotgun", shotgun > 0);
+	CVar_SetBool("weapon_fthrower", fthrower > 0);
+	CVar_SetBool("weapon_plasma", plasmagun > 0);
+	CVar_SetBool("weapon_temp_laser", false);
+	CVar_SetBool("weapon_temp_shotgun", false);
+	CVar_SetBool("weapon_temp_fthrower", false);
+	CVar_SetBool("weapon_temp_plasma", false);
+
 	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
-	HUD_UpdateAmmoItem("handgun", 125, 0);
+	HUD_UpdateAmmoItem("handgun", 125, CVar_GetInt("ammo_max_pistol", 0));
 	HUD_SetAmmoDisplayItem("handgun");
-	
+
 	HUD_AddAmmoItem("laser", GetPackagePath() + "gfx\\lasergunhud.png");
-	HUD_UpdateAmmoItem("laser", 35, 100);
-	
+	HUD_UpdateAmmoItem("laser", 35, CVar_GetInt("ammo_max_lasergun", 0));
+
 	HUD_AddAmmoItem("shotgun", GetPackagePath() + "gfx\\shotgunhud.png");
-	HUD_UpdateAmmoItem("shotgun", 40, 100);
+	HUD_UpdateAmmoItem("shotgun", 40, CVar_GetInt("ammo_max_shotgun", 0));
+
+	HUD_AddAmmoItem("fthrower", GetPackagePath() + "gfx\\fthrowerhud.png");
+	HUD_UpdateAmmoItem("fthrower", 20, CVar_GetInt("ammo_max_fthrower", 0));
+
+	HUD_AddAmmoItem("plasma", GetPackagePath() + "gfx\\plasmagunhud.png");
+	HUD_UpdateAmmoItem("plasma", 15, CVar_GetInt("ammo_max_plasmagun", 0));
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
 	HUD_UpdateCollectable("grenade", 10);
 	
 	HUD_AddCollectable("coins", GetPackagePath() + "gfx\\coin.png", true);
-	HUD_UpdateCollectable("coins", 0);
+	HUD_UpdateCollectable("coins", coins);
 }
 
 //Restore game state

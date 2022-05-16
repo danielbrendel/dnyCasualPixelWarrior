@@ -195,6 +195,8 @@ class CFrogator : IScriptedEntity
 			coin.SetRandomPos(true);
 			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
 		}
+
+		CVar_SetInt("enemies_defeated", CVar_GetInt("enemies_defeated", 0) + 1);
 	}
 	
 	//Process entity stuff

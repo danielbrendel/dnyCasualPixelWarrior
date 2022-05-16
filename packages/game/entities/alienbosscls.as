@@ -287,6 +287,8 @@ class CAlienBoss : IScriptedEntity
 			coin.SetRandomPos(true);
 			Ent_SpawnEntity("item_coin", @coin, this.m_vecPos);
 		}
+
+		CVar_SetInt("enemies_defeated", CVar_GetInt("enemies_defeated", 0) + 1);
 	}
 	
 	//Process entity stuff
@@ -357,23 +359,6 @@ class CAlienBoss : IScriptedEntity
 		bool bCustomColor = (this.m_tmrFlicker.IsActive()) && (this.m_uiFlickerCount % 2 == 0);
 
 		R_DrawSprite(this.m_hMove, vOut, 0, this.m_fRotation, Vector(-1, -1), 0.5f, 0.5f, bCustomColor, sDrawingColor);
-
-		const int iHealthMaxWidth = 500;
-
-		if (this.m_uiHealth > 0) {
-			int iHealthBarWidthPercent = int(this.m_uiHealth) * 100 / C_ALIENBOSS_MAX_HEALTH;
-			int iHealthBarWidthValue = iHealthBarWidthPercent * iHealthMaxWidth / 100;
-
-			Color sBarColor = Color(0, 255, 0, 255);
-			if ((iHealthBarWidthPercent < 65) && (iHealthBarWidthPercent >= 25)) {
-				sBarColor = Color(150, 150, 0, 150);
-			} else if (iHealthBarWidthPercent < 25) {
-				sBarColor = Color(250, 0, 0, 150);
-			}
-
-			R_DrawFilledBox(Vector(Wnd_GetWindowCenterX() - iHealthMaxWidth / 2 - 100, Wnd_GetWindowCenterY() * 2 - 100), Vector(((iHealthBarWidthValue > 0) ? iHealthBarWidthValue : 1), 50), sBarColor);
-			R_DrawString(this.m_hBossFont, _("app.boss", "BOSS"), Vector(Wnd_GetWindowCenterX() - iHealthMaxWidth / 2 - 100 + 2, Wnd_GetWindowCenterY() * 2 - 100), Color(200, 200, 200, 255));
-		}
 	}
 	
 	//Indicate whether this entity shall be removed by the game

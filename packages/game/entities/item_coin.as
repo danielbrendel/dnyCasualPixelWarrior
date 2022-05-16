@@ -161,6 +161,7 @@ class CCoinItem : IScriptedEntity
 			player.AddPlayerScore(1);
 			
 			HUD_UpdateCollectable("coins", HUD_GetCollectableCount("coins") + 1);
+			CVar_SetInt("player_coins", CVar_GetInt("player_coins", 0) + 1);
 			
 			S_PlaySound(this.m_hCollect, S_GetCurrentVolume());
 
