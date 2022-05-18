@@ -126,6 +126,10 @@ class CTankEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("match_finished", false)) {
+			return;
+		}
+		
 		this.m_tmrSpriteChange.Update();
 		if (this.m_tmrSpriteChange.IsElapsed()) {
 			this.m_tmrSpriteChange.Reset();

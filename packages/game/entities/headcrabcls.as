@@ -152,6 +152,10 @@ class CHeadcrabEntity : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("match_finished", false)) {
+			return;
+		}
+		
 		this.m_oShaking.Update();
 		if (this.m_oShaking.IsElapsed()) {
 			if (!this.m_bGotEnemy)

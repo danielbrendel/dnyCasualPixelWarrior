@@ -190,6 +190,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 		CVar_Register("game_started", CVAR_TYPE_BOOL, "0");
 		CVar_Register("game_playtime", CVAR_TYPE_INT, "0");
+		CVar_Register("match_finished", CVAR_TYPE_BOOL, "0");
 
 		this.m_oInfoMenu = CInfoMenu();
 		this.m_oSelectMenu = CMapSelectMenu();
@@ -911,6 +912,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 
 			if (!this.m_bPlayTimeAchOnce) {
 				this.m_bPlayTimeAchOnce = true;
+
+				CVar_SetBool("match_finished", true);
 
 				int iMins = CVar_GetInt("game_playtime", 0) / 60;
 

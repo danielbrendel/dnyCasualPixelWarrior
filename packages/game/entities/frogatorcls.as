@@ -202,6 +202,10 @@ class CFrogator : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("match_finished", false)) {
+			return;
+		}
+		
 		if (this.m_tmrStand.IsActive()) {
 			this.m_tmrStand.Update();
 			if (this.m_tmrStand.IsElapsed()) {

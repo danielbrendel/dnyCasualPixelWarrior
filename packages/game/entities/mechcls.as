@@ -170,6 +170,10 @@ class CMech : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("match_finished", false)) {
+			return;
+		}
+		
 		if (this.m_tmrMove.IsActive()) {
 			this.m_tmrMove.Update();
 

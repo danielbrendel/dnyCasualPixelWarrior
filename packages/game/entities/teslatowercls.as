@@ -145,6 +145,10 @@ class CTeslaTower : IScriptedEntity
 	//Process entity stuff
 	void OnProcess()
 	{
+		if (CVar_GetBool("match_finished", false)) {
+			return;
+		}
+		
 		this.CheckForEnemiesInRange();
 		
 		if (this.m_oAttacking.IsActive()) {
