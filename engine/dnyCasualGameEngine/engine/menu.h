@@ -1093,9 +1093,12 @@ namespace Menu {
 			this->m_hUp = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\up.png", 1, 50, 50, 1, false);
 			this->m_hDown = pRenderer->LoadSprite(wszBasePath + L"media\\gfx\\down.png", 1, 50, 50, 1, false);
 
+			const int iPlayBtnWidth = 230;
+			const int iPlayBtnHeight = 35;
+
 			this->m_oPlay.SetText(oEngineLocaleMgr.QueryPhrase(L"app.playmenu.btnplay", L"Play game!"));
-			this->m_oPlay.SetPosition(Entity::Vector(350, 200));
-			this->m_oPlay.SetSize(Entity::Vector(230, 35));
+			this->m_oPlay.SetPosition(Entity::Vector(pRenderer->GetWindowWidth() / 2 - iPlayBtnWidth / 2, pRenderer->GetWindowHeight() / 2 - iPlayBtnHeight / 2));
+			this->m_oPlay.SetSize(Entity::Vector(iPlayBtnWidth, iPlayBtnHeight));
 			this->m_oPlay.SetOwner(this);
 			this->m_oPlay.SetTextColor(GetPaletteItem(L"playmenu.btnplay.text", Entity::Color(250, 250, 250, 255)));
 			this->m_oPlay.SetFrameColor(GetPaletteItem(L"playmenu.btnplay.frame", Entity::Color(0, 0, 0, 150)));
