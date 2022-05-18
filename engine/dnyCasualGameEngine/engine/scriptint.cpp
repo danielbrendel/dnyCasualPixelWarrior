@@ -17,6 +17,18 @@
 */
 
 namespace Scripting {
+	int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+	{
+		if (code == EXCEPTION_ACCESS_VIOLATION)
+		{
+			return EXCEPTION_EXECUTE_HANDLER;
+		}
+		else
+		{
+			return EXCEPTION_CONTINUE_SEARCH;
+		};
+	}
+
 	CScriptInt::CScriptInt(const std::string& szScriptDir, void* pCallbackFunction) : m_bInitialized(false)
 	{
 		//Construct object
@@ -643,133 +655,138 @@ namespace Scripting {
 
 		if (!pClassInstance)
 			return false;
-		
-		//Create calling context
-		asIScriptContext* pContext = this->m_pScriptEngine->CreateContext();
-		if (!pContext)
-			return false;
 
-		//Query object type
-		asITypeInfo* pTypeInfo = pClassInstance->GetObjectType();
-		if (!pTypeInfo) {
-			pContext->Release();
-			return false;
-		}
+		__try {
 
-		//Query class method
-		asIScriptFunction* pFunction = pTypeInfo->GetMethodByDecl(szMethodDef.c_str());
-		if (!pFunction) {
-			pContext->Release();
-			return false;
-		}
+			//Create calling context
+			asIScriptContext* pContext = this->m_pScriptEngine->CreateContext();
+			if (!pContext)
+				return false;
 
-		//Prepare call stack
-		if (AS_FAILED(pContext->Prepare(pFunction))) {
-			pContext->Release();
-			return false;
-		}
+			//Query object type
+			asITypeInfo* pTypeInfo = pClassInstance->GetObjectType();
+			if (!pTypeInfo) {
+				pContext->Release();
+				return false;
+			}
 
-		//Set object instance pointer
-		if (AS_FAILED(pContext->SetObject(pClassInstance))) {
-			pContext->Release();
-			return false;
-		}
+			//Query class method
+			asIScriptFunction* pFunction = pTypeInfo->GetMethodByDecl(szMethodDef.c_str());
+			if (!pFunction) {
+				pContext->Release();
+				return false;
+			}
 
-		//Push arguments if desired
-		if (pArgs) {
-			int iArgResult = 0;
+			//Prepare call stack
+			if (AS_FAILED(pContext->Prepare(pFunction))) {
+				pContext->Release();
+				return false;
+			}
 
-			for (size_t i = 0; i < pArgs->size(); i++) { //Enumerate through arguments
-				switch ((*pArgs)[i].eType) {
-					//Pass argument according to type
+			//Set object instance pointer
+			if (AS_FAILED(pContext->SetObject(pClassInstance))) {
+				pContext->Release();
+				return false;
+			}
+
+			//Push arguments if desired
+			if (pArgs) {
+				int iArgResult = 0;
+
+				for (size_t i = 0; i < pArgs->size(); i++) { //Enumerate through arguments
+					switch ((*pArgs)[i].eType) {
+						//Pass argument according to type
+					case FA_BYTE:
+						iArgResult = pContext->SetArgByte((asUINT)i, (*pArgs)[i].byte);
+						break;
+					case FA_WORD:
+						iArgResult = pContext->SetArgWord((asUINT)i, (*pArgs)[i].word);
+						break;
+					case FA_DWORD:
+						iArgResult = pContext->SetArgDWord((asUINT)i, (*pArgs)[i].dword);
+						break;
+					case FA_QWORD:
+						iArgResult = pContext->SetArgQWord((asUINT)i, (*pArgs)[i].qword);
+						break;
+					case FA_FLOAT:
+						iArgResult = pContext->SetArgFloat((asUINT)i, (*pArgs)[i].flt);
+						break;
+					case FA_DOUBLE:
+						iArgResult = pContext->SetArgDouble((asUINT)i, (*pArgs)[i].dbl);
+						break;
+					case FA_STRING:
+						iArgResult = pContext->SetArgAddress((asUINT)i, (*pArgs)[i].pstr);
+						break;
+					case FA_POINTER:
+						iArgResult = pContext->SetArgAddress((asUINT)i, (*pArgs)[i].ptr);
+						break;
+					case FA_OBJECT:
+						iArgResult = pContext->SetArgObject((asUINT)i, (*pArgs)[i].ptr);
+						break;
+					default:
+						pContext->Release();
+						return false;
+						break;
+					}
+
+					//Validate result
+					if (AS_FAILED(iArgResult)) {
+						pContext->Release();
+						return false;
+					}
+				}
+			}
+
+			//Call function
+			if (!AS_EXECUTED(pContext->Execute())) {
+				pContext->Release();
+				return false;
+			}
+
+			//Get return value if desired
+			if (pResult) {
+				switch (eResultType) {
+					//Get result value according to type
 				case FA_BYTE:
-					iArgResult = pContext->SetArgByte((asUINT)i, (*pArgs)[i].byte);
+					*(asBYTE*)pResult = pContext->GetReturnByte();
 					break;
 				case FA_WORD:
-					iArgResult = pContext->SetArgWord((asUINT)i, (*pArgs)[i].word);
+					*(asWORD*)pResult = pContext->GetReturnWord();
 					break;
 				case FA_DWORD:
-					iArgResult = pContext->SetArgDWord((asUINT)i, (*pArgs)[i].dword);
+					*(asDWORD*)pResult = pContext->GetReturnDWord();
 					break;
 				case FA_QWORD:
-					iArgResult = pContext->SetArgQWord((asUINT)i, (*pArgs)[i].qword);
+					*(asQWORD*)pResult = pContext->GetReturnQWord();
 					break;
 				case FA_FLOAT:
-					iArgResult = pContext->SetArgFloat((asUINT)i, (*pArgs)[i].flt);
+					*(float*)pResult = pContext->GetReturnFloat();
 					break;
 				case FA_DOUBLE:
-					iArgResult = pContext->SetArgDouble((asUINT)i, (*pArgs)[i].dbl);
+					*(double*)pResult = pContext->GetReturnDouble();
 					break;
 				case FA_STRING:
-					iArgResult = pContext->SetArgAddress((asUINT)i, (*pArgs)[i].pstr);
+					*(std::string*)pResult = *(std::string*)pContext->GetReturnObject();
 					break;
 				case FA_POINTER:
-					iArgResult = pContext->SetArgAddress((asUINT)i, (*pArgs)[i].ptr);
+					*(void**)pResult = pContext->GetReturnAddress();
 					break;
 				case FA_OBJECT:
-					iArgResult = pContext->SetArgObject((asUINT)i, (*pArgs)[i].ptr);
+					*(void**)pResult = pContext->GetReturnAddress();
 					break;
 				default:
 					pContext->Release();
 					return false;
 					break;
 				}
-
-				//Validate result
-				if (AS_FAILED(iArgResult)) {
-					pContext->Release();
-					return false;
-				}
 			}
-		}
 
-		//Call function
-		if (!AS_EXECUTED(pContext->Execute())) {
 			pContext->Release();
+
+			return true;
+		} __except (filter(GetExceptionCode(), GetExceptionInformation())) {
 			return false;
 		}
-
-		//Get return value if desired
-		if (pResult) {
-			switch (eResultType) {
-				//Get result value according to type
-			case FA_BYTE:
-				*(asBYTE*)pResult = pContext->GetReturnByte();
-				break;
-			case FA_WORD:
-				*(asWORD*)pResult = pContext->GetReturnWord();
-				break;
-			case FA_DWORD:
-				*(asDWORD*)pResult = pContext->GetReturnDWord();
-				break;
-			case FA_QWORD:
-				*(asQWORD*)pResult = pContext->GetReturnQWord();
-				break;
-			case FA_FLOAT:
-				*(float*)pResult = pContext->GetReturnFloat();
-				break;
-			case FA_DOUBLE:
-				*(double*)pResult = pContext->GetReturnDouble();
-				break;
-			case FA_STRING:
-				*(std::string*)pResult = *(std::string*)pContext->GetReturnObject();
-				break;
-			case FA_POINTER:
-				*(void**)pResult = pContext->GetReturnAddress();
-				break;
-			case FA_OBJECT:
-				*(void**)pResult = pContext->GetReturnAddress();
-				break;
-			default:
-				pContext->Release();
-				return false;
-				break;
-			}
-		}
-
-		pContext->Release();
-
-		return true;
 	}
 
 	bool CScriptInt::RegisterInterface(const std::string& szName)

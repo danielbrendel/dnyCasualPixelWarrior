@@ -412,6 +412,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		this.m_tmrEndurance.SetActive(true);
 		CVar_SetBool("game_started", false);
 		CVar_SetInt("game_playtime", 0);
+		CVar_SetBool("match_finished", false);
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
@@ -747,7 +748,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		}
 		
 		//Process throwing
-		if ((this.m_uiButtons & BTN_THROW) == BTN_THROW) {
+		if (((this.m_uiButtons & BTN_THROW) == BTN_THROW) && (GetCurrentMap() != "basis.cfg")) {
 			if (this.m_bMayThrow) {
 				this.m_bMayThrow = false;
 				
@@ -1468,6 +1469,11 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("dodges_count", CVAR_TYPE_INT, "0");
 
 	CVar_SetString("mapsel_enter_world", "");
+	CVar_SetInt("enemies_defeated", 0);
+	CVar_SetInt("dodges_count", 0);
+	CVar_SetInt("shots_fired", 0);
+	CVar_SetInt("grenades_thrown", 0);
+	CVar_SetInt("player_coins", 0);
 
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
