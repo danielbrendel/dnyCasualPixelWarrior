@@ -1083,7 +1083,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			if (iPlayTimeMins < 10) { szPlayTimeMins = "0" + szPlayTimeMins; }
 			if (iPlayTimeSecs < 10) { szPlayTimeSecs = "0" + szPlayTimeSecs; }
 			string szPlayTimeInfo = szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs;
-			R_DrawString(R_GetDefaultFont(), szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs, Vector(Wnd_GetWindowCenterX() - (szPlayTimeInfo.length() * 10 / 2) , Wnd_GetWindowCenterY() * 2 - 20), Color(255, 50, 50, 255));
+			R_DrawString(R_GetDefaultFont(), szPlayTimeHours + ":" + szPlayTimeMins + ":" + szPlayTimeSecs, Vector(Wnd_GetWindowCenterX() - (szPlayTimeInfo.length() * 10 / 2) , Wnd_GetWindowCenterY() * 2 - 20), Color(130, 0, 20, 255));
 		}
 
 		this.m_oInfoMenu.Draw();
