@@ -1434,6 +1434,19 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 	}
 }
 
+//Helper to determine if a file exists
+bool Util_FileExists(const string &in szFileName)
+{
+	FileReader fr;
+	fr.Open(szFileName);
+	if (fr.IsOpen()) {
+		fr.Close();
+		return true;
+	}
+
+	return false;
+}
+
 //Create the associated entity here
 void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent, const string &in szPath, const string &in szProps)
 {
@@ -1478,6 +1491,21 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CPlayerEntity @player = CPlayerEntity();
 	Ent_SpawnEntity(szIdent, @player, vecPos);
 	player.SetRotation(fRot);
+
+	if (!Util_FileExists("game\\props\\player.props")) {
+		FileWriter fw;
+		fw.Open("game\\props\\player.props");
+		fw.WriteLine("coins:100");
+		fw.WriteLine("basishint:1");
+		fw.WriteLine("snowland:0");
+		fw.WriteLine("wasteland:0");
+		fw.WriteLine("lavaland:0");
+		fw.WriteLine("lasergun:0");
+		fw.WriteLine("shotgun:0");
+		fw.WriteLine("fthrower:0");
+		fw.WriteLine("plasmagun:0");
+		fw.Close();
+	}
 
 	string props = Props_GetFromFile("player.props");
 	int coins = parseInt(Props_ExtractValue(props, "coins"));
