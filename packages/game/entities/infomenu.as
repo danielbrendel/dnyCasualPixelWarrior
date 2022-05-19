@@ -21,7 +21,9 @@ class CInfoMenu {
     Vector m_vecSize;
     Vector m_vecCursorPos;
     Timer m_tmrUpdateAlpha;
+    SpriteHandle m_hBg;
     SpriteHandle m_hVad;
+    SpriteHandle m_hBtn;
     size_t m_uiVadIndex;
     Timer m_tmrVadAnim;
 
@@ -29,7 +31,9 @@ class CInfoMenu {
     {
         this.m_vecSize = Vector(500, 380);
         this.m_bActive = false;
+        this.m_hBg = R_LoadSprite(GetPackagePath() + "gfx\\menubg.png", 1, this.m_vecSize[0] - 2, this.m_vecSize[1] - 2, 1, true);
         this.m_hVad = R_LoadSprite(GetPackagePath() + "gfx\\vad.png", 4, 29, 35, 4, false);
+        this.m_hBtn = R_LoadSprite(GetPackagePath() + "gfx\\btn_blue.png", 1, 150, 35, 1, true);
         this.m_uiVadIndex = 0;
         this.m_tmrUpdateAlpha.SetDelay(10);
         this.m_tmrVadAnim.SetDelay(250);
@@ -131,7 +135,7 @@ class CInfoMenu {
         }
 
         R_DrawBox(this.m_vecPos, this.m_vecSize, 2, Color(0, 0, 0, 255));
-        R_DrawFilledBox(Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), Vector(this.m_vecSize[0] - 2, this.m_vecSize[1] - 2), Color(150, 150, 150, 255));
+        R_DrawSprite(this.m_hBg, Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 
         R_DrawSprite(this.m_hVad, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + 30), this.m_uiVadIndex, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 
@@ -148,17 +152,18 @@ class CInfoMenu {
 
         Color sColor;
         if (this.MouseInsideNextText()) {
-            sColor = Color(35, 140, 35, 255);
+            sColor = Color(255, 255, 255, 255);
         } else {
-            sColor = Color(30, 120, 30, 255);
+            sColor = Color(215, 215, 215, 255);
         }
 
-        R_DrawString(R_GetDefaultFont(), szCurrent, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
+        R_DrawSprite(this.m_hBtn, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 45), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+        R_DrawString(R_GetDefaultFont(), szCurrent, Vector(this.m_vecPos[0] + 70, this.m_vecPos[1] + this.m_vecSize[1] - 37), sColor);
 
         if (this.MouseInsideSkipText()) {
-            sColor = Color(35, 140, 35, 255);
+            sColor = Color(255, 255, 255, 255);
         } else {
-            sColor = Color(30, 120, 30, 255);
+            sColor = Color(215, 215, 215, 255);
         }
 
         R_DrawString(R_GetDefaultFont(), _("app.infomenu.skip", "Skip"), Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
@@ -167,7 +172,7 @@ class CInfoMenu {
     //Indicate if mouse cursor is inside next-button text
     bool MouseInsideNextText()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 25) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 25 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 45) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 150) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 25 + 35)) {
             return true;
         }
 
