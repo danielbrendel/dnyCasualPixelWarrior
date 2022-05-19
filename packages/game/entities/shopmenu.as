@@ -35,7 +35,12 @@ class CShopMenu {
     Vector m_vecPos;
     Vector m_vecSize;
     Vector m_vecCursorPos;
+    FontHandle m_hTitle;
+    SpriteHandle m_hBg;
     SpriteHandle m_hVad;
+    SpriteHandle m_hSliderLeft;
+    SpriteHandle m_hSliderRight;
+    SpriteHandle m_hBtnClose;
     size_t m_uiVadIndex;
     Timer m_tmrVadAnim;
     SpriteHandle m_hCoin;
@@ -47,11 +52,16 @@ class CShopMenu {
     {
         this.m_vecSize = Vector(600, 450);
         this.m_bActive = false;
+        this.m_hBg = R_LoadSprite(GetPackagePath() + "gfx\\menubg.png", 1, this.m_vecSize[0] - 2, this.m_vecSize[1] - 2, 1, true);
         this.m_hVad = R_LoadSprite(GetPackagePath() + "gfx\\vad.png", 4, 29, 35, 4, false);
+        this.m_hSliderLeft = R_LoadSprite(GetPackagePath() + "gfx\\slider_left.png", 1, 39, 31, 1, true);
+        this.m_hSliderRight = R_LoadSprite(GetPackagePath() + "gfx\\slider_right.png", 1, 39, 31, 1, true);
+        this.m_hBtnClose = R_LoadSprite(GetPackagePath() + "gfx\\btn_blue.png", 1, 150, 35, 1, true);
         this.m_uiVadIndex = 0;
         this.m_tmrVadAnim.SetDelay(250);
         this.m_tmrVadAnim.Reset();
         this.m_tmrVadAnim.SetActive(true);
+        this.m_hTitle = R_LoadFont("Verdana", 20, 35);
         this.m_hCoin = R_LoadSprite(GetPackagePath() + "gfx\\coin.png", 1, 40, 47, 1, false);
         this.m_iTabSelection = 1;
         this.m_iItemIndex = 0;
@@ -165,11 +175,11 @@ class CShopMenu {
         }
 
         R_DrawBox(this.m_vecPos, this.m_vecSize, 2, Color(0, 0, 0, 255));
-        R_DrawFilledBox(Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), Vector(this.m_vecSize[0] - 2, this.m_vecSize[1] - 2), Color(150, 150, 150, 255));
+        R_DrawSprite(this.m_hBg, Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 
         R_DrawSprite(this.m_hVad, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + 30), this.m_uiVadIndex, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 
-        R_DrawString(R_GetDefaultFont(), _("app.shopmenu.title", "Shop"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 50), Color(50, 150, 50, 255));
+        R_DrawString(this.m_hTitle, _("app.shopmenu.title", "Shop"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 30), Color(50, 50, 50, 255));
 
         R_DrawSprite(this.m_hCoin, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 230, this.m_vecPos[1] + 25), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
         R_DrawString(R_GetDefaultFont(), formatInt(HUD_GetCollectableCount("coins")), Vector(this.m_vecPos[0] + this.m_vecSize[0] - 230 + 40, this.m_vecPos[1] + 40), Color(250, 250, 250, 255));
@@ -197,7 +207,7 @@ class CShopMenu {
 
         if (this.m_iTabSelection == SHOP_CAT_WEAPONS) {
             string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemWeapons.length());
-            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 125, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
 
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWeapons.length()) {
@@ -225,7 +235,7 @@ class CShopMenu {
             R_DrawString(R_GetDefaultFont(), _("app.shopmenu.cat.ammo.temporary", "Note: Additional ammo is only temporary."), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 123), Color(50, 50, 50, 255));
 
             string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemAmmo.length());
-            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 125, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
 
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemAmmo.length()) {
@@ -251,7 +261,7 @@ class CShopMenu {
             }
         } else if (this.m_iTabSelection == SHOP_CAT_WORLDS) {
             string szNavInfo = formatInt(this.m_iItemIndex + 1) + " - " + formatInt(this.m_iItemIndex + SHOP_ITEMS_DISPLAY) + " / " + formatInt(this.m_arrShopItemWorlds.length());
-            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
+            R_DrawString(R_GetDefaultFont(), szNavInfo, Vector(this.m_vecPos[0] + 125, this.m_vecPos[1] + this.m_vecSize[1] - 123), Color(100, 100, 100, 255));
 
             for (int i = this.m_iItemIndex; i < this.m_iItemIndex + SHOP_ITEMS_DISPLAY; i++) {
                 if (this.m_iItemIndex + SHOP_ITEMS_DISPLAY <= this.m_arrShopItemWorlds.length()) {
@@ -277,32 +287,33 @@ class CShopMenu {
             }
         }
 
-        Color colScrollLeft = Color(50, 50, 50, 255);
-        if (this.MouseInsideScrollLeftText()) {
-            colScrollLeft = Color(100, 100, 100, 255);
+        Color colScrollLeft = Color(100, 100, 100, 255);
+        if (this.MouseInsideScrollLeft()) {
+            colScrollLeft = Color(50, 50, 50, 255);
         }
-        R_DrawString(R_GetDefaultFont(), "<<", Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 100), colScrollLeft);
+        R_DrawSprite(this.m_hSliderLeft, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + this.m_vecSize[1] - 130), 0, 0.0, Vector(-1, -1), 0.0, 0.0, true, colScrollLeft);
 
-        Color colScrollRight = Color(50, 50, 50, 255);
-        if (this.MouseInsideScrollRightText()) {
-            colScrollRight = Color(100, 100, 100, 255);
+        Color colScrollRight = Color(100, 100, 100, 255);
+        if (this.MouseInsideScrollRight()) {
+            colScrollRight = Color(50, 50, 50, 255);
         }
-        R_DrawString(R_GetDefaultFont(), ">>", Vector(this.m_vecPos[0] + 50, this.m_vecPos[1] + this.m_vecSize[1] - 100), colScrollRight);
+        R_DrawSprite(this.m_hSliderRight, Vector(this.m_vecPos[0] + 65, this.m_vecPos[1] + this.m_vecSize[1] - 130), 0, 0.0, Vector(-1, -1), 0.0, 0.0, true, colScrollRight);
 
         Color sColor;
         if (this.MouseInsideCloseText()) {
-            sColor = Color(100, 100, 100, 255);
+            sColor = Color(255, 255, 255, 255);
         } else {
-            sColor = Color(50, 50, 50, 255);
+            sColor = Color(215, 215, 215, 255);
         }
 
-        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.close", "Close"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
+        R_DrawSprite(this.m_hBtnClose, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 45), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.close", "Close"), Vector(this.m_vecPos[0] + 60, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
     }
 
     //Indicate if mouse cursor is inside close-button text
     bool MouseInsideCloseText()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 25) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 25 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 35) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 164) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 35 + 35)) {
             return true;
         }
 
@@ -339,20 +350,20 @@ class CShopMenu {
         return false;
     }
 
-    //Indicate if mouse cursor is inside scroll left text
-    bool MouseInsideScrollLeftText()
+    //Indicate if mouse cursor is inside scroll left
+    bool MouseInsideScrollLeft()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 20) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 100) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 20 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 100 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 30) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 120) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 30 + 39) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 130 + 40)) {
             return true;
         }
 
         return false;
     }
 
-    //Indicate if mouse cursor is inside scroll right text
-    bool MouseInsideScrollRightText()
+    //Indicate if mouse cursor is inside scroll right
+    bool MouseInsideScrollRight()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 50) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 100) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 50 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 100 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 75) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 120) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 75 + 39) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 130 + 40)) {
             return true;
         }
 
@@ -389,9 +400,9 @@ class CShopMenu {
         } else if (this.MouseInsideCatWorldsText()) {
             this.m_iTabSelection = SHOP_CAT_WORLDS;
             this.m_iItemIndex = 0;
-        } else if (this.MouseInsideScrollLeftText()) {
+        } else if (this.MouseInsideScrollLeft()) {
             this.ScrollLeft();
-        } else if (this.MouseInsideScrollRightText()) {
+        } else if (this.MouseInsideScrollRight()) {
             this.ScrollRight();
         } else {
             if (this.m_iSelectedItem != -1) {
