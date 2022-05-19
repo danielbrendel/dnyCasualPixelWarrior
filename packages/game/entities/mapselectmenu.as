@@ -25,7 +25,10 @@ class CMapSelectMenu {
     Vector m_vecPos;
     Vector m_vecSize;
     Vector m_vecCursorPos;
+    SpriteHandle m_hBg;
     SpriteHandle m_hVad;
+    SpriteHandle m_hBtn;
+    FontHandle m_hTitle;
     size_t m_uiVadIndex;
     Timer m_tmrVadAnim;
 
@@ -33,7 +36,10 @@ class CMapSelectMenu {
     {
         this.m_vecSize = Vector(500, 500);
         this.m_bActive = false;
+        this.m_hTitle = R_LoadFont("Verdana", 20, 35);
+        this.m_hBg = R_LoadSprite(GetPackagePath() + "gfx\\menubg.png", 1, this.m_vecSize[0] - 2, this.m_vecSize[1] - 2, 1, true);
         this.m_hVad = R_LoadSprite(GetPackagePath() + "gfx\\vad.png", 4, 29, 35, 4, false);
+        this.m_hBtn = R_LoadSprite(GetPackagePath() + "gfx\\btn_blue.png", 1, 150, 35, 1, true);
         this.m_uiVadIndex = 0;
         this.m_tmrVadAnim.SetDelay(250);
         this.m_tmrVadAnim.Reset();
@@ -110,11 +116,11 @@ class CMapSelectMenu {
         }
 
         R_DrawBox(this.m_vecPos, this.m_vecSize, 2, Color(0, 0, 0, 255));
-        R_DrawFilledBox(Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), Vector(this.m_vecSize[0] - 2, this.m_vecSize[1] - 2), Color(150, 150, 150, 255));
+        R_DrawSprite(this.m_hBg, Vector(this.m_vecPos[0] + 2, this.m_vecPos[1] + 2), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
 
         R_DrawSprite(this.m_hVad, Vector(this.m_vecPos[0] + this.m_vecSize[0] - 80, this.m_vecPos[1] + 30), this.m_uiVadIndex, 0.0, Vector(-1, -1), 2.0, 2.0, false, Color(0, 0, 0, 0));
 
-        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.title", "Choose a world to enter"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 50), Color(50, 150, 50, 255));
+        R_DrawString(this.m_hTitle, _("app.mapselectmenu.title", "Choose a world"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + 30), Color(50, 50, 50, 255));
 
         for (size_t i = 0; i < this.m_arrMapInfo.length(); i++) {
             bool bDrawOverlay = false;
@@ -131,23 +137,31 @@ class CMapSelectMenu {
             R_DrawString(R_GetDefaultFont(), this.m_arrMapInfo[i].szMap, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + 100 + i * 80 + 15), Color(50, 50, 50, 255));
             R_DrawString(R_GetDefaultFont(), this.m_arrMapInfo[i].szText, Vector(this.m_vecPos[0] + 20, this.m_vecPos[1] + 100 + i * 80 + 55), Color(80, 80, 80, 255));
 
-            R_DrawSprite(this.m_arrMapInfo[i].hSign, Vector(this.m_vecPos[0] + 10 + this.m_vecSize[0] - 100, this.m_vecPos[1] + 100 + i * 80 + 15), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+            Color colSign = Color(0, 0, 0, 0);
+            if (this.m_arrMapInfo[i].bUnlocked) {
+                colSign = Color(90, 255, 90, 255);
+            } else {
+                colSign = Color(243, 115, 123, 255);
+            }
+
+            R_DrawSprite(this.m_arrMapInfo[i].hSign, Vector(this.m_vecPos[0] + 10 + this.m_vecSize[0] - 100, this.m_vecPos[1] + 100 + i * 80 + 15), 0, 0.0, Vector(-1, -1), 0.0, 0.0, true, colSign);
         }
 
         Color sColor;
         if (this.MouseInsideCloseText()) {
-            sColor = Color(100, 100, 100, 255);
+            sColor = Color(255, 255, 255, 255);
         } else {
-            sColor = Color(50, 50, 50, 255);
+            sColor = Color(215, 215, 215, 255);
         }
 
-        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.close", "Close"), Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
+        R_DrawSprite(this.m_hBtn, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 45), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
+        R_DrawString(R_GetDefaultFont(), _("app.mapselectmenu.close", "Close"), Vector(this.m_vecPos[0] + 60, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
     }
 
     //Indicate if mouse cursor is inside close-button text
     bool MouseInsideCloseText()
     {
-        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 25) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 45) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 25 + 25)) {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 35) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 164) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 35 + 35)) {
             return true;
         }
 
