@@ -121,7 +121,7 @@ class CTeslaTower : IScriptedEntity
 		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), Vector(32, 55));
+		bbox.AddBBoxItem(Vector(0, -30), Vector(32, 55));
 		this.m_oModel.Alloc();
 		this.m_oModel.SetCenter(Vector(16, 38));
 		this.m_oModel.Initialize2(bbox, this.m_hSprite);

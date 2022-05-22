@@ -132,7 +132,7 @@ class CAlienInfantry : IScriptedEntity
 		this.m_tmrFlicker.SetActive(false);
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(10, 10), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(-20, -20), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hMove);
 	}

@@ -128,7 +128,7 @@ class CHeadcrabEntity : IScriptedEntity
 		this.m_hAttackSound = S_QuerySound(GetPackagePath() + "sound\\hc_attack.wav");
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(-20, -20), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hSprite);
 	}

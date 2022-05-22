@@ -103,7 +103,7 @@ class CTankEntity : IScriptedEntity
 		this.m_uiFlickerCount = 0;
 		BoundingBox bbox;
 		bbox.Alloc();
-		bbox.AddBBoxItem(Vector(0, 0), this.m_vecSize);
+		bbox.AddBBoxItem(Vector(0, -25), this.m_vecSize);
 		this.m_oModel.Alloc();
 		this.m_oModel.Initialize2(bbox, this.m_hBody);
 	}
