@@ -13,7 +13,7 @@
 
 #include "explosion.as"
 
-const uint MISSILE_DAMAGE = 35;
+const uint MISSILE_DAMAGE = 103;
 
 /* Missile weapon entity */
 class CMissileEntity : IScriptedEntity
@@ -29,14 +29,21 @@ class CMissileEntity : IScriptedEntity
 	bool m_bRemove;
 	float m_fSpeed;
 	int m_iTrailIndex;
+	IScriptedEntity@ m_pOwner;
 
 	CMissileEntity()
     {
 		this.m_bRemove = false;
 		this.m_vecSize = Vector(32, 32);
-		this.m_fSpeed = 200;
+		this.m_fSpeed = 250;
 		this.m_iTrailIndex = 0;
     }
+
+	//Set owner
+	void SetOwner(IScriptedEntity@ pOwner)
+	{
+		@this.m_pOwner = @pOwner;
+	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument
 	void OnSpawn(const Vector& in vec)
@@ -139,7 +146,7 @@ class CMissileEntity : IScriptedEntity
 	//Called for entity collisions
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() == "player") {
+		if (ref.GetName() != this.m_pOwner.GetName()) {
 			this.m_bRemove = true;
 			ref.OnDamage(MISSILE_DAMAGE);
 		}

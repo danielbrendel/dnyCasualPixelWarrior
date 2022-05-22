@@ -18,6 +18,7 @@ string g_szPackagePath = "";
 #include "weapon_flame.as"
 #include "weapon_gun.as"
 #include "weapon_grenade.as"
+#include "weapon_missile.as"
 #include "explosion.as"
 #include "tankcls.as"
 #include "infomenu.as"
@@ -116,6 +117,7 @@ const int WEAPON_RIFLE = 2;
 const int WEAPON_SHOTGUN = 3;
 const int WEAPON_FTHROWER = 4;
 const int WEAPON_PLASMAGUN = 5;
+const int WEAPON_RLAUNCHER = 6;
 const uint GAME_COUNTER_MAX = 5;
 /* Player entity manager */
 class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
@@ -433,6 +435,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 		int lasergunUnlocked = (CVar_GetBool("weapon_laser", false)) ? 1 : 0;
 		int fthrowerUnlocked = (CVar_GetBool("weapon_fthrower", false)) ? 1 : 0;
 		int plasmagunUnlocked = (CVar_GetBool("weapon_plasma", false)) ? 1 : 0;
+		int rlauncherUnlocked = (CVar_GetBool("weapon_rlauncher", false)) ? 1 : 0;
 
 		Props_SaveToFile("coins:" + formatInt(coins) + ";" + 
 			"basishint:" + formatInt(basisHint) + ";" + 
@@ -442,7 +445,8 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 			"lasergun:" + formatInt(lasergunUnlocked) + ";" +
 			"shotgun:" + formatInt(shotgunUnlocked) + ";" +
 			"fthrower:" + formatInt(fthrowerUnlocked) + ";" +
-			"plasmagun:" + formatInt(plasmagunUnlocked) + ";"
+			"plasmagun:" + formatInt(plasmagunUnlocked) + ";" +
+			"rlauncher:" + formatInt(rlauncherUnlocked) + ";"
 		, "player.props");
 	}
 	
@@ -743,6 +747,27 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
 						S_PlaySound(hSound, S_GetCurrentVolume());
 					}
+				} else if (this.m_iCurrentWeapon == WEAPON_RLAUNCHER) {
+					if (HUD_GetAmmoItemCurrent("rlauncher") > 0) {
+						CMissileEntity@ missile = CMissileEntity();
+
+						missile.SetRotation(this.GetRotation());
+						missile.SetOwner(@this);
+
+						Vector vecBulletPos = Vector(this.m_vecPos[0], this.m_vecPos[1]);
+
+						Ent_SpawnEntity("weapon_missile", missile, vecBulletPos);
+						
+						HUD_UpdateAmmoItem("rlauncher", HUD_GetAmmoItemCurrent("rlauncher") - 1, HUD_GetAmmoItemMax("rlauncher"));
+						
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\missile_launch.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+
+						CVar_SetInt("shots_fired", CVar_GetInt("shots_fired", 0) + 1);
+					}  else {
+						SoundHandle hSound = S_QuerySound(g_szPackagePath + "sound\\empty.wav");
+						S_PlaySound(hSound, S_GetCurrentVolume());
+					}
 				}
 			}
 		}
@@ -1011,7 +1036,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animShootHandgun.SetRotation(this.m_fRotation);
 				this.m_animShootHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animShootHandgun.Draw();
-			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN) || (this.m_iCurrentWeapon == WEAPON_RLAUNCHER)) {
 				this.m_animShootRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animShootRifle.SetRotation(this.m_fRotation);
 				this.m_animShootRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -1028,7 +1053,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animMoveHandgun.SetRotation(this.m_fRotation);
 				this.m_animMoveHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animMoveHandgun.Draw();
-			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN) || (this.m_iCurrentWeapon == WEAPON_RLAUNCHER)) {
 				this.m_animMoveRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animMoveRifle.SetRotation(this.m_fRotation);
 				this.m_animMoveRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -1045,7 +1070,7 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_animIdleHandgun.SetRotation(this.m_fRotation);
 				this.m_animIdleHandgun.CustomDrawing(bDrawCustomColor, sDrawingColor);
 				this.m_animIdleHandgun.Draw();
-			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN)) {
+			} else if ((this.m_iCurrentWeapon == WEAPON_RIFLE) || (this.m_iCurrentWeapon == WEAPON_FTHROWER) || (this.m_iCurrentWeapon == WEAPON_PLASMAGUN) || (this.m_iCurrentWeapon == WEAPON_RLAUNCHER)) {
 				this.m_animIdleRifle.SetPosition(Vector(Wnd_GetWindowCenterX() - 64 / 2, Wnd_GetWindowCenterY() - 64 / 2));
 				this.m_animIdleRifle.SetRotation(this.m_fRotation);
 				this.m_animIdleRifle.CustomDrawing(bDrawCustomColor, sDrawingColor);
@@ -1322,6 +1347,11 @@ class CPlayerEntity : IScriptedEntity, IPlayerEntity, ICollectingEntity
 				this.m_iCurrentWeapon = WEAPON_PLASMAGUN;
 				HUD_SetAmmoDisplayItem("plasma");
 			}
+		} else if (vKey == GetKeyBinding("SLOT6")) {
+			if ((CVar_GetBool("weapon_rlauncher", false)) || (CVar_GetBool("weapon_temp_rlauncher", false))) {
+				this.m_iCurrentWeapon = WEAPON_RLAUNCHER;
+				HUD_SetAmmoDisplayItem("rlauncher");
+			}
 		}
 	}
 	
@@ -1468,14 +1498,17 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_Register("ammo_max_lasergun", CVAR_TYPE_INT, "200");
 	CVar_Register("ammo_max_fthrower", CVAR_TYPE_INT, "100");
 	CVar_Register("ammo_max_plasmagun", CVAR_TYPE_INT, "100");
+	CVar_Register("ammo_max_rlauncher", CVAR_TYPE_INT, "100");
 	CVar_Register("weapon_laser", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_shotgun", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_fthrower", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_plasma", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_rlauncher", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_laser", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_shotgun", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_fthrower", CVAR_TYPE_BOOL, "0");
 	CVar_Register("weapon_temp_plasma", CVAR_TYPE_BOOL, "0");
+	CVar_Register("weapon_temp_rlauncher", CVAR_TYPE_BOOL, "0");
 	CVar_Register("enemies_defeated", CVAR_TYPE_INT, "0");
 	CVar_Register("shots_fired", CVAR_TYPE_INT, "0");
 	CVar_Register("grenades_thrown", CVAR_TYPE_INT, "0");
@@ -1504,6 +1537,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 		fw.WriteLine("shotgun:0");
 		fw.WriteLine("fthrower:0");
 		fw.WriteLine("plasmagun:0");
+		fw.WriteLine("rlauncher:0");
 		fw.Close();
 	}
 
@@ -1517,6 +1551,7 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	int shotgun = parseInt(Props_ExtractValue(props, "shotgun"));
 	int fthrower = parseInt(Props_ExtractValue(props, "fthrower"));
 	int plasmagun = parseInt(Props_ExtractValue(props, "plasmagun"));
+	int rlauncher = parseInt(Props_ExtractValue(props, "rlauncher"));
 
 	CVar_SetBool("snowland_unlocked", snowlandUnlocked > 0);
 	CVar_SetBool("wasteland_unlocked", wastelandUnlocked > 0);
@@ -1526,10 +1561,12 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 	CVar_SetBool("weapon_shotgun", shotgun > 0);
 	CVar_SetBool("weapon_fthrower", fthrower > 0);
 	CVar_SetBool("weapon_plasma", plasmagun > 0);
+	CVar_SetBool("weapon_rlauncher", rlauncher > 0);
 	CVar_SetBool("weapon_temp_laser", false);
 	CVar_SetBool("weapon_temp_shotgun", false);
 	CVar_SetBool("weapon_temp_fthrower", false);
 	CVar_SetBool("weapon_temp_plasma", false);
+	CVar_SetBool("weapon_temp_rlauncher", false);
 
 	HUD_AddAmmoItem("handgun", GetPackagePath() + "gfx\\handgunhud.png");
 	HUD_UpdateAmmoItem("handgun", 125, CVar_GetInt("ammo_max_pistol", 0));
@@ -1546,6 +1583,9 @@ void CreateEntity(const Vector &in vecPos, float fRot, const string &in szIdent,
 
 	HUD_AddAmmoItem("plasma", GetPackagePath() + "gfx\\plasmagunhud.png");
 	HUD_UpdateAmmoItem("plasma", 15, CVar_GetInt("ammo_max_plasmagun", 0));
+
+	HUD_AddAmmoItem("rlauncher", GetPackagePath() + "gfx\\rlauncherhud.png");
+	HUD_UpdateAmmoItem("rlauncher", 10, CVar_GetInt("ammo_max_rlauncher", 0));
 	
 	HUD_AddCollectable("grenade", GetPackagePath() + "gfx\\grenade.png", true);
 	HUD_UpdateCollectable("grenade", 10);

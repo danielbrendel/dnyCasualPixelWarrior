@@ -117,12 +117,30 @@ class CWaveInfoMenu {
 
         R_DrawSprite(this.m_btnGreen, Vector(this.m_vecPos[0] + 10, this.m_vecPos[1] + this.m_vecSize[1] - 45), 0, 0.0, Vector(-1, -1), 0.0, 0.0, false, Color(0, 0, 0, 0));
         R_DrawString(R_GetDefaultFont(), _("app.waveinfomenu.gohome", "Go home"), Vector(this.m_vecPos[0] + 50, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor);
+
+        Color sColor2;
+        if (this.MouseInsideTryAgainText()) {
+            sColor2 = Color(255, 255, 255, 255);
+        } else {
+            sColor2 = Color(215, 215, 215, 255);
+        }
+        R_DrawString(R_GetDefaultFont(), _("app.waveinfomenu.tryagain", "Try again"), Vector(this.m_vecPos[0] + this.m_vecSize[0] - 100, this.m_vecPos[1] + this.m_vecSize[1] - 35), sColor2);
     }
 
     //Indicate if mouse cursor is inside close-button text
     bool MouseInsideCloseText()
     {
         if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + 10) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 15) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + 10 + 150) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 15 + 35)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Indicate if mouse cursor is inside try-again-button text
+    bool MouseInsideTryAgainText()
+    {
+        if ((this.m_vecCursorPos[0] >= this.m_vecPos[0] + this.m_vecSize[0] - 80) && (this.m_vecCursorPos[1] >= this.m_vecPos[1] + this.m_vecSize[1] - 35) && (this.m_vecCursorPos[0] < this.m_vecPos[0] + this.m_vecSize[0] - 80 + 65) && (this.m_vecCursorPos[1] < this.m_vecPos[1] + this.m_vecSize[1] - 35 + 25)) {
             return true;
         }
 
@@ -140,6 +158,10 @@ class CWaveInfoMenu {
     {
         if (this.MouseInsideCloseText()) {
             CVar_SetString("mapsel_enter_world", "basis");
+            this.m_bActive = false;
+        } else if (this.MouseInsideTryAgainText()) {
+            string szCurMap = GetCurrentMap();
+            CVar_SetString("mapsel_enter_world", szCurMap.substr(0, szCurMap.findFirst(".")));
             this.m_bActive = false;
         }
     }

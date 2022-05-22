@@ -71,12 +71,14 @@ class CShopMenu {
         this.AddItem("weapon_shotgun", "Shotgun", "", "shotgunhud.png", 1000, SHOP_CAT_WEAPONS);
         this.AddItem("weapon_fthrower", "Flamethrower", "", "fthrowerhud.png", 3500, SHOP_CAT_WEAPONS);
         this.AddItem("weapon_plasma", "Plasma Gun", "", "plasmagunhud.png", 3500, SHOP_CAT_WEAPONS);
+        this.AddItem("weapon_rlauncher", "Rocket Launcher", "", "rlauncherhud.png", 3500, SHOP_CAT_WEAPONS);
 
         this.AddItem("ammo_pistol_x50", "Pistol x50", "", "handgunhud.png", 50, SHOP_CAT_AMMO);
         this.AddItem("ammo_shotgun_x25", "Shotgun x25", "", "shotgunhud.png", 100, SHOP_CAT_AMMO);
         this.AddItem("ammo_lasergun_x25", "Lasergun x25", "", "lasergunhud.png", 100, SHOP_CAT_AMMO);
         this.AddItem("ammo_fthrower_x25", "Flamethrower x25", "", "fthrowerhud.png", 250, SHOP_CAT_AMMO);
         this.AddItem("ammo_plasmagun_x25", "Plasmagun x25", "", "plasmagunhud.png", 250, SHOP_CAT_AMMO);
+        this.AddItem("ammo_rlauncher_x25", "R-Launcher x25", "", "rlauncherhud.png", 250, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x1", "Grenade x1", "", "grenade.png", 100, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x5", "Grenade x5", "", "grenade.png", 350, SHOP_CAT_AMMO);
         this.AddItem("ammo_grenade_x10", "Grenade x10", "", "grenade.png", 500, SHOP_CAT_AMMO);
@@ -448,6 +450,16 @@ class CShopMenu {
                             } else {
                                 HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
                             }
+                        } else if (this.m_arrShopItemWeapons[this.m_iSelectedItem].szIdent == "weapon_rlauncher") {
+                            if (!CVar_GetBool("weapon_rlauncher", false)) {
+                                this.PerformPurchase(this.m_arrShopItemWeapons[this.m_iSelectedItem].iPrice);
+                                CVar_SetBool("weapon_rlauncher", true);
+                                if (!Steam_IsAchievementUnlocked("PURCHASED_RLAUNCHER")) {
+							        Steam_SetAchievement("PURCHASED_RLAUNCHER");
+						        }
+                            } else {
+                                HUD_AddMessage(_("app.shopmenu.purchase.alreadyowned", "You already own this item!"), HUD_MSG_COLOR_BLUE);
+                            }
                         }
                     } else {
                         HUD_AddMessage(_("app.shopmenu.purchase.insufficientfunds", "Insufficient funds!"), HUD_MSG_COLOR_RED);
@@ -469,6 +481,9 @@ class CShopMenu {
                         } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_plasmagun_x25") {
                             this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
                             HUD_UpdateAmmoItem("plasma", HUD_GetAmmoItemCurrent("plasma") + 25, HUD_GetAmmoItemMax("plasma"));
+                        }  else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_rlauncher_x25") {
+                            this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
+                            HUD_UpdateAmmoItem("rlauncher", HUD_GetAmmoItemCurrent("rlauncher") + 25, HUD_GetAmmoItemMax("rlauncher"));
                         } else if (this.m_arrShopItemAmmo[this.m_iSelectedItem].szIdent == "ammo_grenade_x1") {
                             this.PerformPurchase(this.m_arrShopItemAmmo[this.m_iSelectedItem].iPrice);
                             HUD_UpdateCollectable("grenade", HUD_GetCollectableCount("grenade") + 1);

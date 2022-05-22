@@ -65,6 +65,7 @@ class CAlienInfantry : IScriptedEntity
 		
 		CMissileEntity @missile = CMissileEntity();
 		missile.SetRotation(this.m_fRotation);
+		missile.SetOwner(@this);
 
 		Ent_SpawnEntity("weapon_missile", missile, this.m_vecPos);
 
