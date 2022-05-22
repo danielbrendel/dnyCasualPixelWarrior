@@ -177,7 +177,6 @@ namespace Game {
 
 			//Overwrite index map if required
 			if (wszFromMap.length() > 0) {
-				pConsole->AddLine(L"wszFromMap: " + wszFromMap, Console::ConColor(0, 0, 150));
 				this->m_sPackage.wszMapIndex = wszFromMap;
 			}
 
@@ -702,6 +701,13 @@ namespace Game {
 			this->m_wszCurrentLoadingMap = this->GetCurrentMap();
 
 			this->InitStartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath, this->m_wszCurrentLoadingMap);
+		}
+
+		void GoToBasis(void)
+		{
+			//Go back to basis
+
+			this->InitStartGame(this->m_wszCurrentLoadingPackage, this->m_wszCurrentLoadingFromPath);
 		}
 
 		void ShowGameOver(void)

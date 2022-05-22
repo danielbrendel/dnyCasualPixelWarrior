@@ -204,10 +204,9 @@ namespace Menu {
 		Game::pGame->ResumeGame();
 	}
 
-	void MainMenu_OnSaveGame(class CMenu* pMenu)
+	void MainMenu_OnReturnToBasis(class CMenu* pMenu)
 	{
-		Game::pGame->SaveGame();
-		Game::pGame->ResumeGame();
+		Game::pGame->GoToBasis();
 	}
 
 	void MainMenu_OnStopGame(class CMenu* pMenu)

@@ -19,7 +19,7 @@
 /* Menu component */
 namespace Menu {
 	void MainMenu_OnResumeGame(class CMenu* pMenu);
-	void MainMenu_OnSaveGame(class CMenu* pMenu);
+	void MainMenu_OnReturnToBasis(class CMenu* pMenu);
 	void MainMenu_OnStopGame(class CMenu* pMenu);
 	void MainMenu_OnOpenPlay(class CMenu* pMenu);
 	void MainMenu_OnOpenPackages(class CMenu* pMenu);
@@ -658,15 +658,15 @@ namespace Menu {
 			sResumeGame.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.resumegame", L"Resume game");
 			sResumeGame.onClick = &MainMenu_OnResumeGame;
 			sResumeGame.x = 10;
-			sResumeGame.y = h - iStartPos - 50 * 6;
+			sResumeGame.y = h - iStartPos - 50 * 7;
 			sResumeGame.bShow = false;
 
-			/*menuentry_s sSaveGame;
-			sSaveGame.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.savegame", L"Save game");
-			sSaveGame.onClick = &MainMenu_OnSaveGame;
-			sSaveGame.x = 10;
-			sSaveGame.y = h - iStartPos - 50 * 6;
-			sSaveGame.bShow = false;*/
+			menuentry_s sReturnToBasis;
+			sReturnToBasis.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.returntobasis", L"Return to basis");
+			sReturnToBasis.onClick = &MainMenu_OnReturnToBasis;
+			sReturnToBasis.x = 10;
+			sReturnToBasis.y = h - iStartPos - 50 * 6;
+			sReturnToBasis.bShow = false;
 
 			menuentry_s sStopGame;
 			sStopGame.wszText = oEngineLocaleMgr.QueryPhrase(L"app.mainmenu.stopgame", L"Stop game");
@@ -704,7 +704,7 @@ namespace Menu {
 			sQuit.bShow = true;
 
 			this->m_vEntries.push_back(sResumeGame);
-			//this->m_vEntries.push_back(sSaveGame);
+			this->m_vEntries.push_back(sReturnToBasis);
 			this->m_vEntries.push_back(sStopGame);
 			this->m_vEntries.push_back(sPlay);
 			this->m_vEntries.push_back(sPackages);
@@ -769,7 +769,7 @@ namespace Menu {
 		{
 			//Toggle game-active menu specific items
 
-			this->m_vEntries[0].bShow = this->m_vEntries[1].bShow = *this->m_pGameStarted;
+			this->m_vEntries[0].bShow = this->m_vEntries[1].bShow = this->m_vEntries[2].bShow = *this->m_pGameStarted;
 		}
 
 		virtual void SetClassPointer(class CMenu* pContainer)
