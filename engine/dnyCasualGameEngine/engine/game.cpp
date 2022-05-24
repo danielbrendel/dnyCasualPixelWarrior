@@ -72,7 +72,9 @@ namespace Game {
 
 			if (this->m_ilCurCount - this->m_lLastCount > this->m_lFrequency) { //If a second has elapsed
 				this->m_lLastCount = this->m_ilCurCount; //Update last count value
-				this->m_iFrameRate = this->m_iFrames; //Store rate for this second
+				if (this->m_bAllowUpdateFramerate) {
+					this->m_iFrameRate = this->m_iFrames; //Store rate for this second
+				}
 				this->m_iFrames = 0; //Clear to start counting again
 			} else {
 				this->m_iFrames++; //Increment frames
@@ -133,10 +135,22 @@ namespace Game {
 					}
 
 					this->m_bInGameLoadingProgress = false;
+
+					this->m_bAllowUpdateFramerate = false;
+					this->m_dwAllowFrameUpdCur = this->m_dwAllowFrameUpdLast = GetTickCount64();
+					this->m_iFrameRate = 32;
 				}
 			}
 
 			if ((this->m_bGameStarted) && (!this->m_bGamePause)) {
+				//Handle that framerate update are only allowed when a specific time has elapsed per map start
+				if (!this->m_bAllowUpdateFramerate) {
+					this->m_dwAllowFrameUpdCur = GetTickCount64();
+					if (this->m_dwAllowFrameUpdCur > this->m_dwAllowFrameUpdLast + 1500) {
+						this->m_bAllowUpdateFramerate = true;
+					}
+				}
+
 				//Process scripted entities
 				Entity::oScriptedEntMgr.Process();
 

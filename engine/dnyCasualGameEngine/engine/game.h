@@ -126,6 +126,8 @@ namespace Game {
 		int m_iFrames;
 		size_t m_uiSkipFrame;
 		DxSound::HDXSOUND m_hMenuTheme;
+		bool m_bAllowUpdateFramerate;
+		ULONGLONG m_dwAllowFrameUpdCur, m_dwAllowFrameUpdLast;
 
 		friend void Cmd_PackageName(void);
 		friend void Cmd_PackageVersion(void);
@@ -358,7 +360,7 @@ namespace Game {
 			oDxWindowEvents.OnMouseEvent(0, 0, vKey, false, false, false, false);
 		}
 	public:
-		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false), m_iFrames(100), m_iFrameRate(100) { pGame = this; }
+		CGame() : m_bInit(false), m_bGameStarted(false), m_bGamePause(false), m_bShowIntermission(false), pSteamDownloader(nullptr), m_bInGameLoadingProgress(false), m_bGameOver(false), m_bLoadSavedGame(false), m_pHud(nullptr), m_bInAppRestart(false), m_iFrames(100), m_iFrameRate(100), m_bAllowUpdateFramerate(false) { pGame = this; }
 		~CGame() { pGame = nullptr; }
 
 		bool Initialize(const std::wstring& wszPackage = L"", const std::wstring& wszMap = L"")
