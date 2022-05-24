@@ -55,7 +55,7 @@ class CBigExplosionEntity : IScriptedEntity
 		this.m_oExplosion.Reset();
 		this.m_oExplosion.SetActive(true);
 		this.m_hSound = S_QuerySound(GetPackagePath() + "sound\\detonation.wav");
-		S_PlaySound(this.m_hSound, 10);
+		S_PlaySound(this.m_hSound, S_GetCurrentVolume());
 		BoundingBox bbox;
 		bbox.Alloc();
 		bbox.AddBBoxItem(Vector(15, 15), Vector(500, 500));

@@ -58,7 +58,7 @@ class CExplosionEntity : IScriptedEntity
 		this.m_oExplosion.Reset();
 		this.m_oExplosion.SetActive(true);
 		this.m_hSound = S_QuerySound(GetPackagePath() + "sound\\explosion.wav");
-		S_PlaySound(this.m_hSound, 10);
+		S_PlaySound(this.m_hSound, S_GetCurrentVolume());
 		CDecalEntity @dcl = CDecalEntity();
 		Ent_SpawnEntity("decal", @dcl, this.m_vecPos);
 		BoundingBox bbox;

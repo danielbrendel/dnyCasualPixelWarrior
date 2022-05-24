@@ -74,7 +74,7 @@ class CTeslaTower : IScriptedEntity
 				this.m_oAlpha.Reset();
 				this.m_oAlpha.SetActive(true);
 				this.m_ucAlpha = 255;
-				S_PlaySound(this.m_hCharge, 9);
+				S_PlaySound(this.m_hCharge, S_GetCurrentVolume());
 			}
 		} else {
 			if (this.m_oAttacking.IsActive())
@@ -105,7 +105,7 @@ class CTeslaTower : IScriptedEntity
 		
 		Ent_SpawnEntity("weapon_bolt", @obj, Vector(this.m_vecPos[0] - 15, this.m_vecPos[1] + 100));
 
-		S_PlaySound(this.m_hAttack, 10);
+		S_PlaySound(this.m_hAttack, S_GetCurrentVolume());
 	}
 	
 	//Called when the entity gets spawned. The position in the map is passed as argument

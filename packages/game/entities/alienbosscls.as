@@ -180,7 +180,7 @@ class CAlienBoss : IScriptedEntity
 		
 		Ent_SpawnEntity("weapon_bolt", @obj, Vector(this.m_vecPos[0] + 35, this.m_vecPos[1] + 130));
 
-		S_PlaySound(this.m_hBoltSound, 10);
+		S_PlaySound(this.m_hBoltSound, S_GetCurrentVolume());
 	}
 
 	void Fire(IScriptedEntity@ pEntity)

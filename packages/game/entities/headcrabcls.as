@@ -172,7 +172,7 @@ class CHeadcrabEntity : IScriptedEntity
 		this.m_oWalkSound.Update();
 		if (this.m_oWalkSound.IsElapsed()) {
 			this.m_oWalkSound.Reset();
-			S_PlaySound(this.m_hWalkSound, 8);
+			S_PlaySound(this.m_hWalkSound, S_GetCurrentVolume());
 		}
 		
 		this.CheckForEnemiesInRange();
