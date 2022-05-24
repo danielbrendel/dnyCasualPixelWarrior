@@ -146,7 +146,7 @@ class CMissileEntity : IScriptedEntity
 	//Called for entity collisions
 	void OnCollided(IScriptedEntity@ ref)
 	{
-		if (ref.GetName() != this.m_pOwner.GetName()) {
+		if ((@ref != @this.m_pOwner) && (ref.GetName() != this.m_pOwner.GetName()) && (ref.GetName() != this.GetName()) && (ref.GetName() != "weapon_gun") && (ref.GetName() != "weapon_laser") && (ref.GetName() != "weapon_laserball") && (ref.GetName() != "weapon_flame") && (ref.GetName() != "item_ammo_grenade") && (ref.GetName() != "item_ammo_handgun") && (ref.GetName() != "item_ammo_rifle") && (ref.GetName() != "item_ammo_shotgun") && (ref.GetName() != "item_coin") && (ref.GetName() != "item_health")) {
 			this.m_bRemove = true;
 			ref.OnDamage(MISSILE_DAMAGE);
 		}
