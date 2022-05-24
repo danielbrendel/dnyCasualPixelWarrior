@@ -13,7 +13,7 @@
 
 #include "explosion.as"
 
-const uint32 LASER_SHOT_DAMAGE = 20;
+const uint32 LASER_SHOT_DAMAGE = 45;
 
 /* Laser entity */
 class CLaserBallEntity : IScriptedEntity
